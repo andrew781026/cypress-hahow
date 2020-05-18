@@ -1,0 +1,25 @@
+{
+  "name": "cypress-hahow",
+  "version": "0.0.1",
+  "description": "a hahow vedio getter for personal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/andrew781026/cypress-hahow.git"
+  },
+  "keywords": [
+    "hahow",
+    "cypress.io"
+  ],
+  "author": "andrew",
+  "license": "MIT",
+  "devDependencies": {
+    "cypress": "^4.5.0"
+  },
+  "dependencies": {
+    "puppeteer": "^3.0.4"
+  }
+}
