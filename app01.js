@@ -30,8 +30,8 @@ const {user} = require('./pass');
     await googleOAuthPage.waitForSelector('#passwordNext', {visible: true});
     await googleOAuthPage.click('#passwordNext');
 
-    // await googleOAuthPage.waitForSelector('div.U26fgb.O0WRkf.oG5Srb.HQ8yf.C0oVfc.uRo0Xe.M9Bg4d[role="button"]'); // 等 1 秒
-    // await googleOAuthPage.click('div.U26fgb.O0WRkf.oG5Srb.HQ8yf.C0oVfc.uRo0Xe.M9Bg4d[role="button"]');
+    await googleOAuthPage.waitForSelector('div.U26fgb.O0WRkf.oG5Srb.HQ8yf.C0oVfc.uRo0Xe.M9Bg4d[role="button"]'); // 等 1 秒
+    await googleOAuthPage.click('div.U26fgb.O0WRkf.oG5Srb.HQ8yf.C0oVfc.uRo0Xe.M9Bg4d[role="button"]');
 
     await googleOAuthPage.waitForSelector('div.lCoei.YZVTmd.SmR8[role="link"][data-challengetype="8"]');  // 等 1 秒
     await googleOAuthPage.click('div.lCoei.YZVTmd.SmR8[role="link"][data-challengetype="8"]');

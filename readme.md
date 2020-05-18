@@ -12,3 +12,7 @@ https://vod-progressive.akamaized.net/
 exp=1589784939
 ~acl=%2A%2F953736263.mp4%2A
 ~hmac=754bf19d62d7b7987551837a7db1ad30b8acc20a1fdeb7b142b7dbf83486cb8e/vimeo-prod-skyfire-std-us/01/1920/10/259601992/953736263.mp4
+
+## 其他可學習 
+
+- loadtest : 練習網站壓力測試
