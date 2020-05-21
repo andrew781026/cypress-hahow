@@ -16,3 +16,5 @@ exp=1589784939
 ## 其他可學習 
 
 - loadtest : 練習網站壓力測試
+
+https://blog.typeart.cc/using-puppeteer-crawler-common-skills/

@@ -1,14 +1,16 @@
-const url = 'https://hahow.in/courses/586fae97a8aae907000ce721/discussions?item=5a1e1755a2c4b000589dda2c';
+const host = 'https://hahow.in';
+const href = '/courses/586fae97a8aae907000ce721/discussions?item=5a1e1755a2c4b000589dda2c';
+const url = host + href;
 
 const puppeteer = require('puppeteer');
-const {user} = require('./pass');
+const {user} = require('../pass');
+const getClassList = require('./getClassList');
 
 const email = user.email;
 const password = user.password;
 
 // to refresh smsCode : https://accounts.google.com/signin/v2/sl/pwd?service=accountsettings&passive=1209600&osid=1&continue=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&followup=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&rart=ANgoxcekNOGO-0mSsOtSfshBcpp-oiubST_eqqL3tA2N-5iOjoDXtxpdTTy2kEhewG53dpe98Wj-HBSjHxQ9QQeK7gqDgVk01A&authuser=0&csig=AF-SEnYPjEQ1hfrgq2Ef%3A1589955335&flowName=GlifWebSignIn&flowEntry=ServiceLogin
-const smsCode = user.smsCode[7];
-const videoUrls = [];
+const smsCode = user.smsCode[9];
 
 const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) => {
 
@@ -34,7 +36,11 @@ const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) =>
     // 按鈕 : 其他方式
     await googleOAuthPage.waitForSelector('div[role="button"]:not(#idvPreregisteredPhoneNext):not(.x95qze)');
     await googleOAuthPage.waitFor(3000);  // 等 2 秒
-    await googleOAuthPage.click('div[role="button"]:not(#idvPreregisteredPhoneNext):not(.x95qze)');
+    if (await googleOAuthPage.$('div[role="button"]:not(#idvPreregisteredPhoneNext):not(.x95qze)') !== null) {
+
+        await googleOAuthPage.click('div[role="button"]:not(#idvPreregisteredPhoneNext):not(.x95qze)');
+
+    } else await googleOAuthPage.click('button#assistiveActionOutOfQuota');
 
     // 按鈕 : 使用備用碼
     await googleOAuthPage.waitForSelector('div[role="link"][data-challengetype="8"]');
@@ -49,9 +55,9 @@ const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) =>
 
 };
 
-(async () => {
-    const browser = await puppeteer.launch({headless: false});
-    const page = await browser.newPage();
+// 取得課程列表
+const getClasses = async ({browser, page}) => {
+
     await page.goto(url);
     await page.waitFor('button.google'); // wait button .google init
     await page.click('button.google'); // wait button .google init
@@ -59,37 +65,70 @@ const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) =>
     // 利用 備用碼 做 google 兩步驟驗證的登入
     await googleLoginWithBackupCode({browser, email, password, smsCode});
 
-    page.setRequestInterception(true);
-    page.on('request', (request) => {
-        if (request.resourceType() === 'media') {
-
-            // videoUrls.push(request.url()); // collect the url and download the mp4
-            console.log(request.url());
-
-            // TODO save the video from url
-
-            /*
-            * We get the below Urls
-            * https://player.vimeo.com/external/259601992.sd.mp4?s=246afbf015d2e21d45095b1c19d4d2448fe9acc5&time=939
-              https://vod-progressive.akamaized.net/exp=1589967368~acl=%2A%2F953736259.mp4%2A~hmac=164beb8ab3c73c565775f8618a52fb45b2c817ba4e48d13b711c70e69ac5bf4c/vimeo-prod-skyfire-std-us/01/1920/10/259601992/953736259.mp4
-              https://player.vimeo.com/external/259601992.sd.mp4?s=246afbf015d2e21d45095b1c19d4d2448fe9acc5&time=393
-              https://vod-progressive.akamaized.net/exp=1589967370~acl=%2A%2F953736259.mp4%2A~hmac=9e1f6dde0f457ebe9de55ad5bc0ce0756a171f2371cb3d303cc9f0becd448e2f/vimeo-prod-skyfire-std-us/01/1920/10/259601992/953736259.mp4
-            * */
-        }
-        request.continue();
-    });
-
-    await page.waitForSelector('a[href="/notifications"]');
+    await page.waitForSelector('a[href="/notifications"]'); // 等待小鈴鐺小圖示出現
     await page.waitFor(3000); // 等 3 秒
-    const containerHandle = await page.$("#container > ul");
-    const links = await page.evaluate(el => el.innerHTML, containerHandle);
+    const container = await page.$eval("#container > ul", el => el.innerHTML);
 
-    // 下載 html 後 , 用 cheerio 做分析
-    console.log('containerHandle=', containerHandle);
-    console.log('videoUrls=', videoUrls);
-    console.log('links=', links);
+    return getClassList(container);
+};
 
-    await page.screenshot({path: 'img/news.png', fullPage: true});
+(async () => {
 
+    const browser = await puppeteer.launch({headless: false});
+    const page = await browser.newPage();
+
+    const classList = await getClasses({browser, page});
+
+    const getVideoUrl = async (item, page) => {
+
+        const {text, href} = item;
+
+        await page.goto(host + href);
+
+        await page.setRequestInterception(true);
+
+        let videoUrl = null;
+        let saveFlag = true;
+
+        return new Promise((resolve, reject) => {
+
+            page.on('request', (request) => {
+                try {
+
+                    if (saveFlag && request.resourceType() === 'media') {
+
+                        videoUrl = request.url();
+                        console.log('in request , videoUrl=', videoUrl);
+                        saveFlag = false;
+
+                        // Fulfills request with given response
+                        request.respond({
+                            status: 200,
+                            contentType: 'text/plain',
+                            body: 'Finish !!'
+                        });
+
+                        resolve({text, href, videoUrl}); // page.on('request' 處理結束後 , 才會執行此行
+
+                    } else request.continue();
+
+                } catch (e) {
+                    // reject(e);
+                }
+            });
+        });
+
+    };
+
+    const arr = [];
+    for (let i = 0; i < classList.length; i++) {
+
+        const item = classList[i];
+        const obj = await getVideoUrl(item, page);
+        console.log('obj=', obj);
+        arr.push(obj);
+    }
+
+    console.log('arr=', arr);
     // await browser.close();
 })();
