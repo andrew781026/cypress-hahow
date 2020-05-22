@@ -5,12 +5,13 @@ const url = host + href;
 const puppeteer = require('puppeteer');
 const {user} = require('../pass');
 const getClassList = require('./getClassList');
+const myEmitter = require('./eventHook');
 
 const email = user.email;
 const password = user.password;
 
 // to refresh smsCode : https://accounts.google.com/signin/v2/sl/pwd?service=accountsettings&passive=1209600&osid=1&continue=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&followup=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&rart=ANgoxcekNOGO-0mSsOtSfshBcpp-oiubST_eqqL3tA2N-5iOjoDXtxpdTTy2kEhewG53dpe98Wj-HBSjHxQ9QQeK7gqDgVk01A&authuser=0&csig=AF-SEnYPjEQ1hfrgq2Ef%3A1589955335&flowName=GlifWebSignIn&flowEntry=ServiceLogin
-const smsCode = user.smsCode[9];
+const smsCode = user.smsCode[7];
 
 const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) => {
 
@@ -79,56 +80,50 @@ const getClasses = async ({browser, page}) => {
 
     const classList = await getClasses({browser, page});
 
-    const getVideoUrl = async (item, page) => {
-
-        const {text, href} = item;
-
-        await page.goto(host + href);
+    const attachEventsOn = async (page) => {
 
         await page.setRequestInterception(true);
 
-        let videoUrl = null;
-        let saveFlag = true;
+        // register a request listener to page
+        page.on('request', request => {
 
-        return new Promise((resolve, reject) => {
+            if (request.resourceType() === 'media') {
 
-            page.on('request', (request) => {
-                try {
+                videoUrl = request.url();
+                console.log('in request , videoUrl=', videoUrl); // 因為 video 會 request 4 次 , 所以 4 次後 才 goto ?
 
-                    if (saveFlag && request.resourceType() === 'media') {
-
-                        videoUrl = request.url();
-                        console.log('in request , videoUrl=', videoUrl);
-                        saveFlag = false;
-
-                        // Fulfills request with given response
-                        request.respond({
-                            status: 200,
-                            contentType: 'text/plain',
-                            body: 'Finish !!'
-                        });
-
-                        resolve({text, href, videoUrl}); // page.on('request' 處理結束後 , 才會執行此行
-
-                    } else request.continue();
-
-                } catch (e) {
-                    // reject(e);
-                }
-            });
+                myEmitter.emit('appendUrl', {videoUrl}); // addpendUrl and go on next page
+            }
+            request.continue();
         });
 
+        page.on('domcontentloaded', () => {
+
+            console.log('in domcontentloaded,');
+            // here we can put page goto next
+            myEmitter.emit('response'); // addpendUrl and go on next page
+        });
     };
 
-    const arr = [];
-    for (let i = 0; i < classList.length; i++) {
+    // register request event
+    await attachEventsOn(page);
 
-        const item = classList[i];
-        const obj = await getVideoUrl(item, page);
-        console.log('obj=', obj);
-        arr.push(obj);
-    }
+    // 需要使用 callback 的處理方式
+    // => 先 goto 第一個 , 等到 request 後 , goto 下一個 ( 此時 request 需要停止 )
 
-    console.log('arr=', arr);
+    let index = 0;
+
+    const item1 = classList[0];
+    const cb = () => {
+
+        console.log('trigger callback !');
+        const item = classList[++index];
+        myEmitter.emit('addItem', {...item, cb});
+        page.goto(host + item.href, {waitUntil: 'load'}).then().catch(e => console.error(e));
+    };
+
+    myEmitter.emit('addItem', {...item1, cb});
+    await page.goto(host + item1.href, {waitUntil: 'load'}); // 執行一次 , 之後仰賴 callback 執行
+
     // await browser.close();
 })();
