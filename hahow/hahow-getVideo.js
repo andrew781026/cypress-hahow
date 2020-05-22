@@ -11,7 +11,7 @@ const email = user.email;
 const password = user.password;
 
 // to refresh smsCode : https://accounts.google.com/signin/v2/sl/pwd?service=accountsettings&passive=1209600&osid=1&continue=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&followup=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&rart=ANgoxcekNOGO-0mSsOtSfshBcpp-oiubST_eqqL3tA2N-5iOjoDXtxpdTTy2kEhewG53dpe98Wj-HBSjHxQ9QQeK7gqDgVk01A&authuser=0&csig=AF-SEnYPjEQ1hfrgq2Ef%3A1589955335&flowName=GlifWebSignIn&flowEntry=ServiceLogin
-const smsCode = user.smsCode[7];
+const smsCode = user.smsCode[0];
 
 const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) => {
 
@@ -112,8 +112,6 @@ const getClasses = async ({browser, page}) => {
     // => 先 goto 第一個 , 等到 request 後 , goto 下一個 ( 此時 request 需要停止 )
 
     let index = 0;
-
-    const item1 = classList[0];
     const cb = () => {
 
         console.log('trigger callback !');
@@ -122,6 +120,7 @@ const getClasses = async ({browser, page}) => {
         page.goto(host + item.href, {waitUntil: 'load'}).then().catch(e => console.error(e));
     };
 
+    const item1 = classList[0];
     myEmitter.emit('addItem', {...item1, cb});
     await page.goto(host + item1.href, {waitUntil: 'load'}); // 執行一次 , 之後仰賴 callback 執行
 
