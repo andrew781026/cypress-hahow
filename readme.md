@@ -18,3 +18,5 @@ exp=1589784939
 - loadtest : 練習網站壓力測試
 
 https://blog.typeart.cc/using-puppeteer-crawler-common-skills/
+
+如果要處理印表機功能 - https://www.npmjs.com/package/node-thermal-printer

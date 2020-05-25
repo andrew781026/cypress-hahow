@@ -1,6 +1,4 @@
 const host = 'https://hahow.in';
-const href = '/courses/586fae97a8aae907000ce721/discussions?item=5a1e1755a2c4b000589dda2c';
-const url = host + href;
 
 const puppeteer = require('puppeteer');
 const {user} = require('../pass');
@@ -11,7 +9,7 @@ const email = user.email;
 const password = user.password;
 
 // to refresh smsCode : https://accounts.google.com/signin/v2/sl/pwd?service=accountsettings&passive=1209600&osid=1&continue=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&followup=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwo-step-verification%3Frfr%3Dsem&rart=ANgoxcekNOGO-0mSsOtSfshBcpp-oiubST_eqqL3tA2N-5iOjoDXtxpdTTy2kEhewG53dpe98Wj-HBSjHxQ9QQeK7gqDgVk01A&authuser=0&csig=AF-SEnYPjEQ1hfrgq2Ef%3A1589955335&flowName=GlifWebSignIn&flowEntry=ServiceLogin
-const smsCode = user.smsCode[0];
+const smsCode = user.smsCode[9];
 
 const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) => {
 
@@ -59,7 +57,8 @@ const googleLoginWithBackupCode = async ({browser, email, password, smsCode}) =>
 // 取得課程列表
 const getClasses = async ({browser, page}) => {
 
-    await page.goto(url);
+    const href = '/courses/586fae97a8aae907000ce721/discussions?item=5a1e1755a2c4b000589dda2c';
+    await page.goto(host + href);
     await page.waitFor('button.google'); // wait button .google init
     await page.click('button.google'); // wait button .google init
 
@@ -72,6 +71,14 @@ const getClasses = async ({browser, page}) => {
 
     return getClassList(container);
 };
+
+process.on('uncaughtException', (err, origin) => {
+    fs.writeSync(
+        process.stderr.fd,
+        `Caught exception: ${err}\n` +
+        `Exception origin: ${origin}`
+    );
+});
 
 (async () => {
 
@@ -97,16 +104,24 @@ const getClasses = async ({browser, page}) => {
             request.continue();
         });
 
+        /*
         page.on('domcontentloaded', () => {
 
             console.log('in domcontentloaded,');
             // here we can put page goto next
             myEmitter.emit('response'); // addpendUrl and go on next page
         });
+         */
     };
 
     // register request event
     await attachEventsOn(page);
+
+    // 先利用 Google Auth , 取得 jwtToken
+    // https://api.hahow.in/api/users/me/boughtCourses/586fae97a8aae907000ce721/videoProgresses
+    // 取得目前個人的觀看進度
+    // https://api.hahow.in/api/lectures/[lecture_id]
+    // 取得課程內容 , lecture_id 可從 videoProgresses 中取得
 
     // 需要使用 callback 的處理方式
     // => 先 goto 第一個 , 等到 request 後 , goto 下一個 ( 此時 request 需要停止 )
@@ -117,7 +132,19 @@ const getClasses = async ({browser, page}) => {
         console.log('trigger callback !');
         const item = classList[++index];
         myEmitter.emit('addItem', {...item, cb});
-        page.goto(host + item.href, {waitUntil: 'load'}).then().catch(e => console.error(e));
+
+        const stopRequest = async () => {
+
+            // window.stop(); should cancel any pending image or script requests.
+            // page.evaluate 在 browser 中執行傳入的 Function
+            await page.evaluate(() => window.stop());
+
+            await page.waitFor(1000); // 等 1 秒
+
+            await page.goto(host + item.href, {waitUntil: 'load'});
+        };
+
+        stopRequest().then().catch(e => console.error(e));
     };
 
     const item1 = classList[0];
