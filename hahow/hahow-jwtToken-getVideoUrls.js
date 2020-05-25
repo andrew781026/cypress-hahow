@@ -1,8 +1,28 @@
-// 1. 取得 jwtToken - 可能有效期為 1 小時
+// 1. 取得 jwtToken
 
 // 2. 用 videoProgress 取得課程相關 ID ( ex : lecture_id )
 
+const fs = require('fs');
 const Axios = require('axios');
+const moment = require('moment');
+
+const promiseAll = async (promises, concurrency = 5) => {
+
+    const result = [];
+    const length = promises.length;
+    const times = Math.ceil(length / concurrency);
+
+    for (let i = 0; i < times; i++) {
+
+        const pageEnd = concurrency * (i + 1);
+        const end = Math.min(pageEnd, length);
+        const arr = promises.slice(concurrency * i, end);
+        result.push(await Promise.all(arr));
+        // console.log('arr=', result[i]);
+    }
+
+    return result.reduce((pre, curr) => [...pre, ...curr], []);
+};
 
 const HttpUtil = {
     async get({url, token}) {
@@ -20,23 +40,44 @@ const HttpUtil = {
 const getApiToken = jwtToken => `Bearer ${jwtToken}`;
 
 /* the videoProgressUrl response like below
+    ASSIGNMENT 是作業 / LECTURE 是課程
 [
-    {
-        "status": "PLAYED",
-        "progressInSeconds": 258.593,
-        "_id": "5db81c98a29ef8cc770*****",
-        "course": "586fae97a8aae907000*****",
-        "lecture": "591d0f1f00f58c07007*****",
-        "owner": "5c592fc679f1990022d*****"
+   {
+       "_id": "5c91835ced65c200740ef386",
+       "title": "課程介紹與導讀",
+       "items": [
+            {
+               "type": "LECTURE",
+               "_id": "5a1e1755a2c4b000589dda06",
+               "content": {
+                  "_id": "59131bf62fa2a607008bc8e6",
+                  "moduleItem": "5a1e1755a2c4b000589dda06",
+                  ...
+               }
+            },
+            ...
+            {
+               "type": "ASSIGNMENT",
+               "_id": "5a1e1755a2c4b000589dda53",
+               "content": {
+                  "_id": "586fae97a8aae907000ce722",
+                  "moduleItem": "5a1e1755a2c4b000589dda53",
+                  ...
+               }
+            },
+        ]
     },
 ...]
 */
 const getLectureIds = async ({classId, token}) => {
 
-    const videoProgressUrl = `https://api.hahow.in/api/users/me/boughtCourses/${classId}/videoProgresses`;
-    const data = await HttpUtil.get({url: videoProgressUrl, token});
-    console.log('data=', data);
-    return data.map(item => item.lecture);
+    const itemUrl = `https://api.hahow.in/api/courses/${classId}/modules/items`;
+    const data = await HttpUtil.get({url: itemUrl, token});
+
+    return data
+        .reduce((pre, curr) => [...pre, ...curr.items], [])
+        .filter(single => single.type === 'LECTURE' && single.content.video.isExisted) // 是 LECTURE 類型且 有 video
+        .map(single => single.content._id);
 };
 
 // 3. 用 lecture_id 取得課程某章節資訊 ( 章節說明文字 . 影片網址 ...等 )
@@ -79,8 +120,12 @@ const getLectureInfo = async ({lectureId, token}) => {
 
     const lectureInfoUrl = `https://api.hahow.in/api/lectures/${lectureId}`;
     const data = await HttpUtil.get({url: lectureInfoUrl, token});
-    const video = data.video.videos.find(item => item.quality === 'sd' && item.width === 960);
-    return {link: video.link, title: data.title};
+
+    return {
+        imageUrl: data.video.previewImageUrls.VIMEO.DIMENSION_W1000,
+        videoUrl: data.video.videos.find(item => item.quality === 'sd' && item.width === 960).link,
+        title: data.title
+    };
 };
 
 // 產生一個 async function 並立即執行他
@@ -97,31 +142,20 @@ const getLectureInfo = async ({lectureId, token}) => {
 
     const promiseIterator = lectureIds.map(lectureId => getLectureInfo({lectureId, token}));
 
-    const promiseAll = async (promises, concurrency = 5) => {
-
-        const result = [];
-        const length = promises.length;
-        const times = Math.ceil(length / concurrency);
-
-        for (let i = 0; i < times; i++) {
-
-            const pageEnd = concurrency * (i + 1);
-            const end = Math.min(pageEnd, length);
-            const arr = promises.slice(concurrency * i, end);
-            result.push(await Promise.all(arr));
-            // console.log('arr=', result[i]);
-        }
-
-        return result.reduce((pre, curr) => [...pre, ...curr], []);
-    };
-
     const lectureInfoArray = await promiseAll(promiseIterator, 5);
 
     console.log('lectureInfoArray=', lectureInfoArray);
-    fs.writeFileSync('./videos.json', JSON.stringify(lectureInfoArray));
+    const path = `./videos-${clazz.id}-${moment().format('YYYY-MM-DD_HH時mm分ss秒')}.json`;
+    const newPath = path.replace('時', 'h').replace('分', 'm').replace('秒', 's');
+    fs.writeFileSync(newPath, JSON.stringify(lectureInfoArray));
 })();
 
 // push the mp4 to personal private channel in youtube
 
-
 // make it become electron App
+
+// 下載中
+
+// 上傳中
+
+// 管理帳號 . 頻道管理

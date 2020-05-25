@@ -1,5 +1,6 @@
 // 參考資料 : https://segmentfault.com/a/1190000019961682
 
+// 此 JS 為壓力測試的範例
 const loadtest = require('loadtest');
 const {linebotUrls} = require('./pass');
 
