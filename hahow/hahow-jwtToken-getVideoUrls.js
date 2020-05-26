@@ -3,41 +3,9 @@
 // 2. 用 videoProgress 取得課程相關 ID ( ex : lecture_id )
 
 const fs = require('fs');
-const Axios = require('axios');
 const moment = require('moment');
-
-const promiseAll = async (promises, concurrency = 5) => {
-
-    const result = [];
-    const length = promises.length;
-    const times = Math.ceil(length / concurrency);
-
-    for (let i = 0; i < times; i++) {
-
-        const pageEnd = concurrency * (i + 1);
-        const end = Math.min(pageEnd, length);
-        const arr = promises.slice(concurrency * i, end);
-        result.push(await Promise.all(arr));
-        // console.log('arr=', result[i]);
-    }
-
-    return result.reduce((pre, curr) => [...pre, ...curr], []);
-};
-
-const HttpUtil = {
-    async get({url, token}) {
-
-        const response = await Axios({
-            method: "GET",
-            url,
-            headers: {Authorization: getApiToken(token)},
-        });
-
-        return await response.data;
-    },
-};
-
-const getApiToken = jwtToken => `Bearer ${jwtToken}`;
+const {promiseAll, hook} = require('../utils/tool');
+const {HttpUtil} = require('../utils/http');
 
 /* the videoProgressUrl response like below
     ASSIGNMENT 是作業 / LECTURE 是課程
@@ -131,13 +99,18 @@ const getLectureInfo = async ({lectureId, token}) => {
 // 產生一個 async function 並立即執行他
 (async () => {
 
+    hook();
     const {token} = require('./response/passport');
     const clazz = {
+        // 課程 ID
         id: '586fae97a8aae907000ce721',
+        // 課程名稱
         name: "動畫互動網頁特效入門（JS/CANVAS）",
+        // 老師名稱
         author: "吳哲宇",
     };
 
+    // 取得章節 ID
     const lectureIds = await getLectureIds({classId: clazz.id, token});
 
     const promiseIterator = lectureIds.map(lectureId => getLectureInfo({lectureId, token}));
@@ -146,7 +119,9 @@ const getLectureInfo = async ({lectureId, token}) => {
 
     console.log('lectureInfoArray=', lectureInfoArray);
     const path = `./videos-${clazz.id}-${moment().format('YYYY-MM-DD_HH時mm分ss秒')}.json`;
-    const newPath = path.replace('時', 'h').replace('分', 'm').replace('秒', 's');
+    // const newPath = path.replace('時', 'h').replace('分', 'm').replace('秒', 's');
+    const newPath = path.mapReplace({'時': 'h', '分': 'm', '秒': 's'});
+    console.log('newPath=', newPath);
     fs.writeFileSync(newPath, JSON.stringify(lectureInfoArray));
 })();
 
