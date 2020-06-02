@@ -22,18 +22,37 @@ const mapReplace = (str, replaceMap = {}) => {
     return Object.keys(replaceMap).reduce(cb, str);
 };
 
-const hook = () => {
+const stringHook = (name,func) => {
 
-    // 將 mapReplace 函數 , 掛勾到 String 上
-    String.prototype.mapReplace = function (replaceMap) {
+    // 將 func 函數 , 掛勾到 String 上
+    String.prototype[name] = function (...params) {
 
         // 用 this.toString() 將 this 物件轉換成字串
-        return mapReplace(this.toString(), replaceMap);
+        return func(this.toString(), ...params);
+    }
+};
+
+const deleteFolderRecursive = function(path) {
+
+    const fs = require('fs');
+    const Path = require('path');
+
+    if (fs.existsSync(path)) {
+        fs.readdirSync(path).forEach((file, index) => {
+            const curPath = Path.join(path, file);
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
     }
 };
 
 module.exports = {
     promiseAll,
     mapReplace,
-    hook
+    stringHook,
+    deleteFolderRecursive,
 };

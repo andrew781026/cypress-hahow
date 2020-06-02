@@ -3,8 +3,9 @@
 // 2. 用 videoProgress 取得課程相關 ID ( ex : lecture_id )
 
 const fs = require('fs');
+const download = require('download');
 const moment = require('moment');
-const {promiseAll, hook} = require('../utils/tool');
+const {promiseAll, stringHook, mapReplace, deleteFolderRecursive} = require('../utils/tool');
 const {HttpUtil} = require('../utils/http');
 
 /* the videoProgressUrl response like below
@@ -96,10 +97,28 @@ const getLectureInfo = async ({lectureId, token}) => {
     };
 };
 
+// 4. 將抓出的資料存到檔案中
+const saveVideoInfo = async ({clazz, arr}) => {
+
+    const path = `./videos-${clazz.id}-${moment().format('YYYY-MM-DD_HH時mm分ss秒')}.json`;
+    const newPath = path.mapReplace({'時': 'h', '分': 'm', '秒': 's'});
+    fs.writeFileSync(newPath, JSON.stringify(arr));
+
+    return arr;
+};
+
+// 5. 將影片檔案下載並儲存
+const saveVideoFromUrl = async ({url, dest}) => {
+
+    deleteFolderRecursive(dest);
+
+    await download(url, dest);
+};
+
 // 產生一個 async function 並立即執行他
 (async () => {
 
-    hook();
+    stringHook('mapReplace', mapReplace);
     const {token} = require('./response/passport');
     const clazz = {
         // 課程 ID
@@ -117,12 +136,20 @@ const getLectureInfo = async ({lectureId, token}) => {
 
     const lectureInfoArray = await promiseAll(promiseIterator, 5);
 
-    console.log('lectureInfoArray=', lectureInfoArray);
-    const path = `./videos-${clazz.id}-${moment().format('YYYY-MM-DD_HH時mm分ss秒')}.json`;
-    // const newPath = path.replace('時', 'h').replace('分', 'm').replace('秒', 's');
-    const newPath = path.mapReplace({'時': 'h', '分': 'm', '秒': 's'});
-    console.log('newPath=', newPath);
-    fs.writeFileSync(newPath, JSON.stringify(lectureInfoArray));
+    await saveVideoInfo({arr: lectureInfoArray, clazz});
+
+    const item = lectureInfoArray[0];
+    saveVideoFromUrl({url: item.videoUrl, dest: `./video/${item.title}`})
+        .then(
+            // onFulfilled
+            () => {
+
+                console.log('success download !!');
+
+            },
+            // onRejected
+            (err) => console.error(err)
+        );
 })();
 
 // push the mp4 to personal private channel in youtube

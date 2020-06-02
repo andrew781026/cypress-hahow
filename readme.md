@@ -18,3 +18,8 @@
 https://blog.typeart.cc/using-puppeteer-crawler-common-skills/
 
 如果要處理印表機功能 - https://www.npmjs.com/package/node-thermal-printer
+
+## 好用的套件 
+
+### [Tmp](https://www.npmjs.com/package/tmp)
+A simple temporary file and directory creator for node.js.
