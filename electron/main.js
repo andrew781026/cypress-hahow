@@ -36,32 +36,24 @@ const template = [
             {role: 'cut'},
             {role: 'copy'},
             {role: 'paste'},
-            ...(isMac ? [
-                {role: 'pasteAndMatchStyle'},
-                {role: 'delete'},
-                {role: 'selectAll'},
-                {type: 'separator'},
-                {
-                    label: 'Speech',
-                    submenu: [
-                        {role: 'startspeaking'},
-                        {role: 'stopspeaking'}
-                    ]
-                }
-            ] : [
-                {role: 'delete'},
-                {type: 'separator'},
-                {role: 'selectAll'}
-            ])
+            {role: 'delete'},
+            {type: 'separator'},
+            {
+                label: '開發者工具',
+                role: 'toggledevtools'
+            }
         ]
     },
     // { role: 'viewMenu' }
     {
-        label: 'View',
+        label: '查看',
         submenu: [
             {role: 'reload'},
             {role: 'forcereload'},
-            {role: 'toggledevtools'},
+            {
+                label: '開發者工具',
+                role: 'toggledevtools'
+            },
             {type: 'separator'},
             {role: 'resetzoom'},
             {role: 'zoomin'},
@@ -111,7 +103,6 @@ function createWindow() {
         // frame: false,
         // autoHideMenuBar: true
     });
-
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
