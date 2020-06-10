@@ -23,3 +23,6 @@ https://blog.typeart.cc/using-puppeteer-crawler-common-skills/
 
 ### [Tmp](https://www.npmjs.com/package/tmp)
 A simple temporary file and directory creator for node.js.
+
+- 設定 electron & vue - https://juejin.im/post/5d1abff7f265da1bb80c47e3
+- [想要试试Electron ，不如看看这篇爬坑总结](https://juejin.im/post/5ede23c6e51d45783f11023d)

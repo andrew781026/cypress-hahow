@@ -3,6 +3,8 @@ const {app, Menu, isMac, BrowserWindow} = require('electron');
 const path = require('path');
 require('electron-reload')(__dirname);
 
+// 使用 vue.js 開發 , 然後將畫面改到 electron 上面 (將編譯後的 vue 轉到 main.js 上面)
+
 const template = [
     // { role: 'appMenu' }
     ...(isMac ? [{
