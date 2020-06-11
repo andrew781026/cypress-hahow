@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import First from "./screens/First";
+    import First from "./views/First";
 
     export default {
         name: 'App',
