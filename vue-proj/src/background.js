@@ -1,7 +1,7 @@
 'use strict';
 
 import {app, protocol, BrowserWindow} from 'electron'
-import path from 'path';
+
 import {
     createProtocol,
     /* installVueDevtools */
@@ -17,6 +17,9 @@ let win;
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: {secure: true, standard: true}}])
 
 function createWindow() {
+
+    const path = require('path');
+
     // Create the browser window.
     win = new BrowserWindow({
         width: 800,
