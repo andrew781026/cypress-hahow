@@ -1,24 +1,11 @@
 # vue-proj
+ 
+  這是一個用 vue 建立 electron 的一個專案
 
-## Project setup
-```
-npm install
-```
+## 安裝步驟 
 
-### Compiles and hot-reloads for development
+```bash=
+npm install -g @vue/cli
+vue add electron-builder
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+然後 , 就可以用 `npm run electron:serve`

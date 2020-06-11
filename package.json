@@ -4,8 +4,7 @@
   "description": "a hahow vedio getter for personal",
   "main": "index.js",
   "scripts": {
-    "start": "electron ./electron/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron ./electron/main.js"
   },
   "repository": {
     "type": "github",
