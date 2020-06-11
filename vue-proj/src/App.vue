@@ -1,15 +1,16 @@
 <template>
-    <first/>
+    <div id="app">
+        <button v-if="$router.history.current.name !== 'Home'" @click="$router.back()">
+            返回上一頁
+        </button>
+        <router-view/>
+    </div>
 </template>
 
 <script>
-    import First from "./views/First";
 
     export default {
         name: 'App',
-        components: {
-            'first': First
-        }
     }
 </script>
 
@@ -24,7 +25,7 @@
     }
 
     #app {
-        font-family: '微軟正黑體', Avenir, Helvetica, Arial, sans-serif;
+        font-family: '微軟正黑體', Avenir, Helvetica, Arial, sans-serif, -apple-system, BlinkMacSystemFont;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }

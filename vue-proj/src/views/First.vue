@@ -1,6 +1,10 @@
 <template>
     <div id="app">
         <div style="padding: 10px">
+            <router-link :to="{name:'Second'}">
+                到 Second 頁面
+            </router-link>
+            <br>
             <input style="margin-right: 5px" type="text" v-model="text" @keypress.enter="save"/>
             <button @click="save">儲存文字</button>
             <br>
@@ -10,7 +14,8 @@
         <div class="card" v-for="(local,index) in locals" :key="`local-${index}`">
             <p>名稱 : {{local.name}}</p>
             <p>IP 位置 : </p>
-            <p style="margin-left: 10px"><span style="background-color: red;color: white">[ {{local.family}} ]</span> {{local.address}}</p>
+            <p style="margin-left: 10px"><span style="background-color: red;color: white">[ {{local.family}} ]</span>
+                {{local.address}}</p>
             <p>MAC 地址 : {{local.mac}}</p>
         </div>
         <div class="card" v-for="(dns,index) in dnsArr" :key="`dns-${index}`">
