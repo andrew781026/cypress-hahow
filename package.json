@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "cypress": "^4.5.0",
-    "electron": "^9.0.1",
+    "electron": "^9.0.3",
     "electron-reload": "^1.5.0",
     "puppeteer": "^3.0.4",
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.1"
