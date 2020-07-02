@@ -1,24 +1,54 @@
-
+<template>
     <div id="app">
-        <button v-if="$router.history.current.name !== 'Home'" @click="$router.back()">
-            返回上一頁
-        </button>
-        <router-view/>
+        <div style="padding: 10px">
+            <input style="margin-right: 5px" type="text" v-model="text" @keypress.enter="save"/>
+            <button @click="save">儲存文字</button>
+            <br>
+            <button @click="getInfo">取得本機資訊</button>
+            <br>
+        </div>
+        <div class="card" v-for="(local,index) in locals" :key="`local-${index}`">
+            <p>名稱 : {{local.name}}</p>
+            <p>IP 位置 : </p>
+            <p style="margin-left: 10px"><span style="background-color: red;color: white">[ {{local.family}} ]</span> {{local.address}}</p>
+            <p>MAC 地址 : {{local.mac}}</p>
+        </div>
+        <div class="card" v-for="(dns,index) in dnsArr" :key="`dns-${index}`">
+            <p>DNS 伺服器 : {{dns}}</p>
+        </div>
     </div>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+</template>
+
 <script>
 
     export default {
         name: 'App',
+        methods: {
+            save() {
+
+                // call the registered listener
+                window.registerFuncs.appendText(this.text);
+                this.text = '';
+            },
+            getInfo() {
+
+                // call the registered listener
+                this.locals = window.registerFuncs.getIpInfo();
+                this.dnsArr = window.registerFuncs.getDnsServers();
+            },
+        },
+        data() {
+
+            return {
+                text: null,
+                locals: [],
+                dnsArr: [],
+            }
+        }
     }
 </script>
 
+<style>
 
     * {
         box-sizing: border-box;
@@ -29,26 +59,16 @@
     }
 
     #app {
-        font-family: '微軟正黑體', Avenir, Helvetica, Arial, sans-serif, -apple-system, BlinkMacSystemFont;
+        font-family: '微軟正黑體', Avenir, Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
 
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+    .card {
+        margin: 20px;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: aliceblue;
+        box-shadow: 0 0 7px 3px rgba(0, 0, 0, 0.2);
+    }
+</style>
