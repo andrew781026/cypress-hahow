@@ -32,6 +32,8 @@
             },
             getInfo() {
 
+                window.ipcRenderer.send('call-getInfo');
+
                 // call the registered listener
                 this.locals = window.registerFuncs.getIpInfo();
                 this.dnsArr = window.registerFuncs.getDnsServers();

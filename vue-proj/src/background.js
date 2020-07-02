@@ -1,10 +1,11 @@
-import {app, protocol, ipcMain, BrowserWindow} from 'electron';
+import {app, protocol, BrowserWindow} from 'electron';
 import path from 'path';
 
 import {
     createProtocol,
     /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
+import './app/ipcMains';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -80,10 +81,6 @@ app.on('ready', async () => {
 
     }
     createWindow()
-});
-
-// .handle method can return result to ipcRenderer.invoke
-ipcMain.handle('get-', async () => {
 });
 
 // Exit cleanly on request from parent process in development mode.
