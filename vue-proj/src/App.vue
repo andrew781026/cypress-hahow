@@ -1,52 +1,18 @@
 <template>
     <div id="app">
-        <div style="padding: 10px">
-            <input style="margin-right: 5px" type="text" v-model="text" @keypress.enter="save"/>
-            <button @click="save">儲存文字</button>
-            <br>
-            <button @click="getInfo">取得本機資訊</button>
-            <br>
-        </div>
-        <div class="card" v-for="(local,index) in locals" :key="`local-${index}`">
-            <p>名稱 : {{local.name}}</p>
-            <p>IP 位置 : </p>
-            <p style="margin-left: 10px"><span style="background-color: red;color: white">[ {{local.family}} ]</span> {{local.address}}</p>
-            <p>MAC 地址 : {{local.mac}}</p>
-        </div>
-        <div class="card" v-for="(dns,index) in dnsArr" :key="`dns-${index}`">
-            <p>DNS 伺服器 : {{dns}}</p>
-        </div>
+        <hahow-title/>
+        <router-view/>
     </div>
 </template>
 
 <script>
+    import HahowTitle from './components/HahowTitle'
 
     export default {
         name: 'App',
-        methods: {
-            save() {
-
-                // call the registered listener
-                window.registerFuncs.appendText(this.text);
-                this.text = '';
-            },
-            getInfo() {
-
-                window.ipcRenderer.send('call-getInfo');
-
-                // call the registered listener
-                this.locals = window.registerFuncs.getIpInfo();
-                this.dnsArr = window.registerFuncs.getDnsServers();
-            },
+        components: {
+            'hahow-title': HahowTitle
         },
-        data() {
-
-            return {
-                text: null,
-                locals: [],
-                dnsArr: [],
-            }
-        }
     }
 </script>
 
@@ -64,13 +30,5 @@
         font-family: '微軟正黑體', Avenir, Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-    }
-
-    .card {
-        margin: 20px;
-        padding: 10px;
-        border-radius: 8px;
-        background-color: aliceblue;
-        box-shadow: 0 0 7px 3px rgba(0, 0, 0, 0.2);
     }
 </style>
