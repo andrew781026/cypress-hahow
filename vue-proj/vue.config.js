@@ -1,4 +1,12 @@
 module.exports = {
+    chainWebpack: config => {
+        config
+            .plugin('html')
+            .tap(args => {
+                args[0].title = 'Hahow 課程管理器';
+                return args;
+            })
+    },
     pluginOptions: {
         electronBuilder: {
             preload: 'src/preload.js',

@@ -1,6 +1,5 @@
-'use strict';
-
-import {app, protocol, BrowserWindow} from 'electron'
+import {app, protocol, ipcMain, BrowserWindow} from 'electron';
+import path from 'path';
 
 import {
     createProtocol,
@@ -17,8 +16,6 @@ let win;
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: {secure: true, standard: true}}])
 
 function createWindow() {
-
-    const path = require('path');
 
     // Create the browser window.
     win = new BrowserWindow({
@@ -83,6 +80,10 @@ app.on('ready', async () => {
 
     }
     createWindow()
+});
+
+// .handle method can return result to ipcRenderer.invoke
+ipcMain.handle('get-', async () => {
 });
 
 // Exit cleanly on request from parent process in development mode.

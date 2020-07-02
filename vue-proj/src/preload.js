@@ -3,6 +3,9 @@ const path = require('path');
 const os = require('os');
 const dns = require('dns');
 
+import { ipcRenderer } from 'electron';
+window.ipcRenderer = ipcRenderer;
+
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 window.addEventListener('DOMContentLoaded', () => {
