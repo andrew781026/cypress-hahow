@@ -150,6 +150,8 @@ const saveVideoFromUrl = async ({url, dest}) => {
             // onRejected
             (err) => console.error(err)
         );
+
+    // we need to download mp4 to target folder
 })();
 
 // push the mp4 to personal private channel in youtube
