@@ -21,3 +21,8 @@ String.prototype.show = function () {
 };
 
 'QQ'.show();
+
+// ref : https://stackoverflow.com/questions/28241002/moment-js-include-text-in-middle-of-date-format
+const moment = require('moment');
+const str = moment().format('YYYY-MM-DD_HH[h]mm[m]ss[s]');
+console.log('str=',str);

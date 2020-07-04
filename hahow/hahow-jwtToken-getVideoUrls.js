@@ -100,9 +100,9 @@ const getLectureInfo = async ({lectureId, token}) => {
 // 4. 將抓出的資料存到檔案中
 const saveVideoInfo = async ({clazz, arr}) => {
 
-    const path = `./videos-${clazz.id}-${moment().format('YYYY-MM-DD_HH時mm分ss秒')}.json`;
-    const newPath = path.mapReplace({'時': 'h', '分': 'm', '秒': 's'});
-    fs.writeFileSync(newPath, JSON.stringify(arr));
+    // Escape it with square braces []
+    const path = `./videos-${clazz.id}-${moment().format('YYYY-MM-DD_HH[h]mm[m]ss[s]')}.json`;
+    fs.writeFileSync(path, JSON.stringify(arr));
 
     return arr;
 };
