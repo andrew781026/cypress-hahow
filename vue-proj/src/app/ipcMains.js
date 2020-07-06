@@ -1,11 +1,33 @@
 import {ipcMain} from "electron";
+import low from 'lowdb';
+import FileSync from 'lowdb/adapters/FileSync';
 
-ipcMain.on('call-getInfo',  (event, args) => {
+const adapter = new FileSync('../data/db.json');
+const db = low(adapter);
+
+// Set some defaults (required if your JSON file is empty)
+db.defaults({youtubeToken: '', hahowToken: ''}).write();
+
+ipcMain.on('call-getInfo', (event, args) => {
     console.log('call-getInfo !!');
 });
 
 // .handle method can return result to ipcRenderer.invoke
-ipcMain.handle('get-', async () => {
+ipcMain.handle('save-youtubeToken', async (apiKey) => {
+
+    // Increment count
+    db.update('youtubeToken', apiKey).write();
+
+    return 'you save youtube success';
+});
+
+// .handle method can return result to ipcRenderer.invoke
+ipcMain.handle('save-hahowToken', async (apiKey) => {
+
+    // Increment count
+    db.update('hahowToken', apiKey).write();
+
+    return 'you save hahow success';
 });
 
 // 顯示上次下載的進度 ,
