@@ -1,5 +1,6 @@
 <template>
     <div>
+        <courses/>
         <div class="root w-full flex flex-col border-collapse overflow-auto">
             <div class="flex justify-between p-12 border border-solid">
                 <img src="../assets/image.png" alt="">
@@ -68,8 +69,14 @@
 </template>
 
 <script>
+    import Courses from './Courses'
+
+
     export default {
-        name: "Download"
+        name: "Download",
+        components: {
+            'courses': Courses
+        },
     }
 </script>
 

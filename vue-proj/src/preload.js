@@ -3,12 +3,21 @@ const path = require('path');
 const os = require('os');
 const dns = require('dns');
 
-import { ipcRenderer } from 'electron';
+import {ipcRenderer} from 'electron';
+
 window.ipcRenderer = ipcRenderer;
 
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 window.addEventListener('DOMContentLoaded', () => {
+
+    ipcRenderer.send('connect-to-json-db');
+
+    /*
+       ipcRenderer.eventNames() lists all channels that have listeners
+       ipcRenderer.rawListeners(channel) lists all listeners for a particular channel
+       ipcRenderer.eventNames().forEach(channel => ipcRenderer.rawListeners(channel))
+    */
 
     // setting many function on windows
 

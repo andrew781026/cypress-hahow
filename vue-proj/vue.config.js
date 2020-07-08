@@ -1,11 +1,20 @@
+// vue.config.js
+const path = require('path');
+
+function addStyleResource (rule) {
+    rule.use('style-resource')
+        .loader('style-resources-loader')
+        .options({
+            patterns: [
+                path.resolve(__dirname, './src/styles/imports.styl'),
+            ],
+        })
+}
+
 module.exports = {
     chainWebpack: config => {
-        config
-            .plugin('html')
-            .tap(args => {
-                args[0].title = 'Hahow 課程管理器';
-                return args;
-            })
+        const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
+        types.forEach(type => addStyleResource(config.module.rule('stylus').oneOf(type)));
     },
     pluginOptions: {
         electronBuilder: {
