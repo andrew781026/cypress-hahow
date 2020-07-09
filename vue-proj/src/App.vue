@@ -6,13 +6,26 @@
 </template>
 
 <script>
-    import HahowTitle from './components/HahowTitle'
+    import HahowTitle from './components/HahowTitle';
+    import {mapActions} from 'vuex';
 
     export default {
         name: 'App',
         components: {
             'hahow-title': HahowTitle
         },
+        methods: {
+            ...mapActions({
+                setInitData: '[MAIN] SET_INIT_DATA',
+            }),
+        },
+        mounted() {
+
+            window.ipcRenderer.invoke('connect-to-json-db')
+                .then(() => window.ipcRenderer.invoke('get-json-db-all-info'))
+                .then(this.setInitData)
+                .catch(err => console.error(err));
+        }
     }
 </script>
 

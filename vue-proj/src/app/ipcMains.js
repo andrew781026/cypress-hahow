@@ -4,6 +4,8 @@ import path from 'path';
 import low from 'lowdb'; // json db
 import FileSync from 'lowdb/adapters/FileSync';
 
+let db;
+
 const createFileIfNotExist = targetPath => {
 
     if (fs.existsSync(targetPath)) return 'file db.json already exist';
@@ -20,17 +22,20 @@ const createFileIfNotExist = targetPath => {
 
 createFileIfNotExist(path.resolve(__dirname, '../data/db.json'));
 
-ipcMain.on('connect-to-json-db', (event, args) => {
+ipcMain.handle('connect-to-json-db', async (event, args) => {
 
     const adapter = new FileSync(path.resolve(__dirname, '../data/db.json'));
-    const db = low(adapter);
+    db = low(adapter);
 
     // Set some defaults (required if your JSON file is empty)
-    db.defaults({youtubeToken: '', hahowToken: '', clazzes: []}).write();
+    db.defaults({youtubeToken: '', hahowToken: '', courses: []}).write();
+
+    return 'connect done !';
 });
 
-ipcMain.on('call-getInfo', (event, args) => {
-    console.log('call-getInfo !!');
+ipcMain.handle('get-json-db-all-info',  (event, args) => {
+
+    return db.getState(); // { youtubeToken: '', hahowToken: '', courses: [] }
 });
 
 // .handle method can return result to ipcRenderer.invoke
@@ -43,10 +48,11 @@ ipcMain.handle('save-youtubeToken', async (apiKey) => {
 });
 
 // .handle method can return result to ipcRenderer.invoke
-ipcMain.handle('save-hahowToken', async (apiKey) => {
+ipcMain.handle('save-hahowToken', async (event, apiKey) => {
 
-    // Increment count
-    db.update('hahowToken', apiKey).write();
+    db.set('hahowToken', apiKey).write();
+
+    // authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzU5MmZjNjc5ZjE5OTAwMjJkZmYxMjAiLCJpc3MiOiJNakF5TURBMiIsImlhdCI6MTU5MjM4Mjg0MywiZXhwIjoxNTk3NTY2ODQzfQ.xQeTqXOxH7dWJqiQj-hJCkfLDKG4Os6FivMeZgbiKao
 
     return 'you save hahow success';
 });

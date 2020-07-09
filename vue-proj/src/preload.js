@@ -11,8 +11,6 @@ window.ipcRenderer = ipcRenderer;
 // It has the same sandbox as a Chrome extension.
 window.addEventListener('DOMContentLoaded', () => {
 
-    ipcRenderer.send('connect-to-json-db');
-
     /*
        ipcRenderer.eventNames() lists all channels that have listeners
        ipcRenderer.rawListeners(channel) lists all listeners for a particular channel

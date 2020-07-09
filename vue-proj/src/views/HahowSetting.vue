@@ -13,7 +13,7 @@
             <button type="button" class="btn btn-secondary" @click="apiKey = ''">清除</button>
         </div>
         <div>
-            已儲存的 Hahow API KEY 是 <span class="text-orange-light">{{$store.state.hahowToken}}</span>
+            已儲存的 Hahow API KEY 是 <span class="text-orange-light break-words">{{$store.state.hahowToken}}</span>
         </div>
     </div>
 </template>
@@ -24,10 +24,15 @@
         methods: {
             save() {
 
-                this.$store.state.hahowToken = this.apiKey;
-                window.ipcRenderer.invoke().then().catch();
-                this.apiKey = '';
-                console.log('this.$store.hahowToken=', this.$store.state.hahowToken);
+                window.ipcRenderer.invoke('save-hahowToken',this.apiKey)
+                    .then(() => {
+
+                        this.$store.state.hahowToken = this.apiKey;
+                        window.ipcRenderer.invoke().then().catch();
+                        this.apiKey = '';
+                        console.log('this.$store.hahowToken=', this.$store.state.hahowToken);
+                    })
+                    .catch(err => console.error(err))
             },
         },
         data() {
