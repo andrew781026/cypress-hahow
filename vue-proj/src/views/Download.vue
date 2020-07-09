@@ -69,6 +69,12 @@
 
     export default {
         name: "Download",
+        mounted() {
+
+            window.ipcRenderer.invoke('get-course-videos')
+                .then(videoInfos => console.log('videoInfos=', videoInfos))
+                .catch(err => console.error(err));
+        }
     }
 </script>
 

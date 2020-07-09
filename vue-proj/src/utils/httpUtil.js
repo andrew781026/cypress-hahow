@@ -2,7 +2,7 @@ const Axios = require('axios');
 
 const getApiToken = jwtToken => `Bearer ${jwtToken}`;
 
-const HttpUtil = {
+export const HttpUtil = {
     async get({url, token}) {
 
         const response = await Axios({
@@ -13,8 +13,4 @@ const HttpUtil = {
 
         return await response.data;
     },
-};
-
-module.exports = {
-    HttpUtil
 };
