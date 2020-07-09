@@ -11,8 +11,11 @@
             <button type="button" class="btn btn-primary mr-8" @click="save">儲存</button>
             <button type="button" class="btn btn-secondary" @click="apiKey = ''">清除</button>
         </div>
-        <div>
-            已儲存的 Youtube API KEY 是 <span class="text-orange-light">{{$store.state.youtubeToken}}</span>
+        <div v-if="$store.state.youtubeToken">
+            已儲存的 Youtube API KEY 是
+            <div class="text-yellow break-words bg-black rounded-6 p-8 mt-2">
+                {{$store.state.youtubeToken}}
+            </div>
         </div>
     </div>
 </template>

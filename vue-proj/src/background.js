@@ -23,6 +23,7 @@ function createWindow() {
         width: 800,
         height: 600,
         autoHideMenuBar: true,
+        icon: path.join(__dirname, '../public/elearning.ico'),
         webPreferences: {
             // Use pluginOptions.nodeIntegration, leave this alone
             // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info

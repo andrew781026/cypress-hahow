@@ -9,6 +9,9 @@ import './css/main.css';
 
 Vue.config.productionTip = false;
 
+import VuePageTransition from 'vue-page-transition';
+Vue.use(VuePageTransition);
+
 new Vue({
   router,
   store,

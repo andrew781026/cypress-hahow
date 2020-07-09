@@ -1,7 +1,9 @@
 <template>
     <div id="app">
         <hahow-title/>
-        <router-view/>
+        <vue-page-transition name="fade-in-left">
+            <router-view/>
+        </vue-page-transition>
     </div>
 </template>
 
