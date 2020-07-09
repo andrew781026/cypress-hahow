@@ -14,8 +14,12 @@
             <img class="mr-2" src="../assets/hahow-icon.png" alt="hahow-icon" width="40px">
             設定 Hahow
         </div>
+        <div class="nav-title-text cursor-pointer col bg-course d-flex border-right border-dark align-items-center" @click="link('Course')">
+            <img class="mr-2" src="../assets/training.png" alt="course-icon" width="40px">
+            我的課程
+        </div>
         <div class="nav-title-text cursor-pointer col bg-download d-flex align-items-center" @click="link('Download')">
-            <img class="mr-2" src="../assets/direct-download.png" alt="hahow-icon" width="40px">
+            <img class="mr-2" src="../assets/direct-download.png" alt="download-icon" width="40px">
             下載與上傳管理
         </div>
     </div>
@@ -67,6 +71,19 @@
 
         &:active {
             background-color: #00ad88;
+        }
+    }
+
+    .bg-course {
+
+        background-color: #fbbd60;
+
+        &:hover {
+            background-color: #faad39;
+        }
+
+        &:active {
+            background-color: #e19b33;
         }
     }
 

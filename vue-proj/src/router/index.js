@@ -33,6 +33,11 @@ const routes = [
         component: () => import('../views/Exit.vue')
     },
     {
+        path: '/course',
+        name: 'Course',
+        component: () => import('../views/Courses.vue')
+    },
+    {
         path: '/download',
         name: 'Download',
         component: () => import('../views/Download.vue')

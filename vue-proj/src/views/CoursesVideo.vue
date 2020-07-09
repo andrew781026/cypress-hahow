@@ -68,7 +68,7 @@
 <script>
 
     export default {
-        name: "Download",
+        name: "CoursesVideo",
     }
 </script>
 

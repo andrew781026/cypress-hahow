@@ -23,6 +23,7 @@
         },
         mounted() {
 
+            // TODO 需要製作網路異常的 message box => 可用 web-socket 檢查連線是否正常
             window.ipcRenderer.invoke('connect-to-json-db')
                 .then(() => window.ipcRenderer.invoke('get-json-db-all-info'))
                 .then(this.setInitData)

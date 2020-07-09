@@ -20,7 +20,7 @@ function createWindow() {
 
     // Create the browser window.
     win = new BrowserWindow({
-        width: 800,
+        width: 850,
         height: 600,
         autoHideMenuBar: true,
         icon: path.join(__dirname, '../public/elearning.ico'),

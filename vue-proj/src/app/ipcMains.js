@@ -1,4 +1,5 @@
 import {ipcMain} from "electron";
+import {HttpUtil} from '../utils/httpUtil';
 import fs from 'fs';
 import path from 'path';
 import low from 'lowdb'; // json db
@@ -33,7 +34,7 @@ ipcMain.handle('connect-to-json-db', async (event, args) => {
     return 'connect done !';
 });
 
-ipcMain.handle('get-json-db-all-info',  (event, args) => {
+ipcMain.handle('get-json-db-all-info', (event, args) => {
 
     return db.getState(); // { youtubeToken: '', hahowToken: '', courses: [] }
 });
@@ -51,8 +52,6 @@ ipcMain.handle('save-youtubeToken', async (apiKey) => {
 ipcMain.handle('save-hahowToken', async (event, apiKey) => {
 
     db.set('hahowToken', apiKey).write();
-
-    // authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzU5MmZjNjc5ZjE5OTAwMjJkZmYxMjAiLCJpc3MiOiJNakF5TURBMiIsImlhdCI6MTU5MjM4Mjg0MywiZXhwIjoxNTk3NTY2ODQzfQ.xQeTqXOxH7dWJqiQj-hJCkfLDKG4Os6FivMeZgbiKao
 
     return 'you save hahow success';
 });
@@ -74,14 +73,44 @@ ipcMain.handle('get-personal-courses', async () => {
     const getBoughtCourses = async ({token}) => {
 
         const itemUrl = 'https://api.hahow.in/api/users/me/boughtCourses';
-        const data = await HttpUtil.get({url: itemUrl, token});
-
-        return data;
+        return await HttpUtil.get({url: itemUrl, token});
     };
 
     const token = db.get('hahowToken').value();
     const courses = await getBoughtCourses({token});
-    console.log('courses=', courses);
+    db.set('courses',courses).write();
+
+
+    /*
+      the response of courses data :
+       {
+            "creationsProgress": 0,
+            "lecturesVideoProgress": 0.034482758620689655, // 課程完成度
+            "certificateAcquired": false, // 是否完成課程
+            "status": "PUBLISHED", // 課程狀態
+            "averageRating": 4.98, // 平均星數
+            "numRating": 333, // 總星數
+            "_id": "56189df9df7b3d0b005c6639",
+            "assignment": "56189df9df7b3d0b005c663a",
+            "owner": {
+            "_id": "56189df7df7b3d0b005c6638",
+            "profileImageUrl": "https://hahow.in/images/59940a4d38c46c0700654afc", // 講師頭像
+            "name": "吳哲宇", // 講師名稱
+            "username": "majer"
+            },
+            "title": "動畫互動網頁程式入門 (HTML/CSS/JS)",
+            "metaDescription": "互動網頁程式設計課程，教你用 illustrator 的思維來學習網頁前端程式設計，從網站的結構開始設計，掌握 JS、HTML、CSS 等程式語法，帶你製作出實用且美觀的互動式網頁。",
+            "coverImage": {
+            "_id": "5b8726df297df5001efb75c0",
+            "url": "https://images.api.hahow.in/images/5b8726df297df5001efb75c0" // 課程圖片
+            },
+            "totalVideoLengthInSeconds": 104721, // 課程時長
+        },
+
+     */
+
+
+    return courses;
 });
 
 // the class info will save to local json
