@@ -3,7 +3,7 @@
         <button type="button" class="btn btn-primary ml-12 mt-12" @click="getBoughtCourses">取得我的課程</button>
         <div id="show-courses" class="pl-20 pb-32 flex flex-wrap w-full">
             <template v-for="(item,index) in courses">
-                <div class="relative mr-20 mt-40 course-container" :key="index">
+                <div class="relative mr-20 mt-40 course-container" :key="index" @click="getCourseVideos(item._id)">
                     <!-- 課程圖片 -->
                     <img class="author-avatar" alt="author-avatar"
                          :src="item.owner.profileImageUrl" :title="item.owner.name"/>
@@ -49,6 +49,19 @@
                 window.ipcRenderer.invoke('get-personal-courses')
                     .then(courses => this.courses = courses)
                     .catch(err => console.error(err)); // TODO 顯示取得資料失敗
+
+                // const course_id = '56189df9df7b3d0b005c6639';
+            },
+            getCourseVideos(course_id) {
+
+                window.ipcRenderer.invoke('get-course-videos', course_id)
+                    .then(videos => {
+                        alert('影片資訊下載成功 !');
+                        console.log('videos=', videos);
+                    })
+                    .catch(err => console.error(err));
+
+                // const course_id = '56189df9df7b3d0b005c6639';
             },
         },
         data() {
@@ -90,7 +103,7 @@
         width: 80%;
         height: 10px;
         border-radius: 8px;
-        background-color: #CCCCCC;
+        background-color: #cccccc;
         margin-right: 8px;
         overflow: hidden;
         position: relative;
@@ -115,6 +128,23 @@
         max-width: 220px;
         min-width: 220px;
         box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.24);
+        cursor: pointer;
+
+        &:hover {
+            background-color: #d1d1d1;
+
+            .course-progress-bar {
+                background-color: #b7b7b7;
+            }
+        }
+
+        &:active {
+            background-color: #b7b7b7;
+
+            .course-progress-bar {
+                background-color: #a3a3a3;
+            }
+        }
     }
 
     .img-container {
