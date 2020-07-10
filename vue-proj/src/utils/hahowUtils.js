@@ -1,4 +1,4 @@
-import {HttpUtil} from './httpUtil';
+import HttpUtil from './httpUtil';
 
 class HahowUtils {
 

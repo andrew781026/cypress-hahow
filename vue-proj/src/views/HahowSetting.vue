@@ -9,8 +9,8 @@
                    @keypress.enter="save"/>
         </div>
         <div class="mb-8">
-            <button type="button" class="btn btn-primary mr-8" @click="save">儲存</button>
-            <button type="button" class="btn btn-secondary" @click="apiKey = ''">清除</button>
+            <button type="button" class="btn btn-primary mr-8" :disabled="!apiKey" @click="save">儲存</button>
+            <button type="button" class="btn btn-secondary" :disabled="!apiKey" @click="apiKey = ''">清除</button>
         </div>
         <div v-if="$store.state.hahowToken">
             已儲存的 Hahow API KEY 是

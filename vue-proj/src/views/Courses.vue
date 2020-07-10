@@ -41,13 +41,23 @@
 </template>
 
 <script>
+    import {mapActions} from 'vuex'
+
     export default {
         name: "Courses",
         methods: {
+            ...mapActions({
+                openLoadingMask: '[MAIN] OPEN_LOADING_MASK',
+                closeLoadingMask: '[MAIN] CLOSE_LOADING_MASK',
+            }),
             getBoughtCourses() {
 
+                this.openLoadingMask();
                 window.ipcRenderer.invoke('get-personal-courses')
-                    .then(courses => this.courses = courses)
+                    .then(courses => {
+                        this.courses = courses;
+                        this.closeLoadingMask();
+                    })
                     .catch(err => console.error(err)); // TODO 顯示取得資料失敗
 
                 // const course_id = '56189df9df7b3d0b005c6639';

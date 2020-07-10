@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <hahow-title/>
+        <loading-mask/>
         <vue-page-transition name="fade-in-left">
             <router-view/>
         </vue-page-transition>
@@ -9,12 +10,14 @@
 
 <script>
     import HahowTitle from './components/HahowTitle';
+    import LoadingMask from './components/LoadingMask';
     import {mapActions} from 'vuex';
 
     export default {
         name: 'App',
         components: {
-            'hahow-title': HahowTitle
+            'hahow-title': HahowTitle,
+            'loading-mask': LoadingMask,
         },
         methods: {
             ...mapActions({
