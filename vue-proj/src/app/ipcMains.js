@@ -1,5 +1,6 @@
 import {ipcMain} from "electron";
 import HahowUtils from '../utils/hahowUtils';
+import {createWindow} from '../utils/electronUtils';
 import {createFileIfNotExist} from '../utils/ezoomUtils';
 import path from 'path';
 import low from 'lowdb'; // json db
@@ -94,7 +95,7 @@ ipcMain.handle('get-personal-courses', async () => {
     }
 });
 
-// the class info will save to local json
+// 取得課程詳細資訊
 ipcMain.handle('get-course-videos', async (event, course_id) => {
 
     const token = db.get('hahowToken').value();
@@ -108,6 +109,12 @@ ipcMain.handle('get-course-videos', async (event, course_id) => {
     const database = low(adapter);
     database.setState(videoInfos).write();
     return videoInfos;
+});
+
+// 換頁到 Download 顯示課程詳細資訊
+ipcMain.on('show-course-videos',  (event, course_id) => {
+
+
 });
 
 

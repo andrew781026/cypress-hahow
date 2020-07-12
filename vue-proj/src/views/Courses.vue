@@ -64,10 +64,11 @@
             },
             getCourseVideos(course_id) {
 
+                this.openLoadingMask();
                 window.ipcRenderer.invoke('get-course-videos', course_id)
                     .then(videos => {
-                        alert('影片資訊下載成功 !');
-                        console.log('videos=', videos);
+                        this.$router.push({name: 'Download', params: {videos}});
+                        this.closeLoadingMask();
                     })
                     .catch(err => console.error(err));
 

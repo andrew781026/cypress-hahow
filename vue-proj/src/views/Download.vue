@@ -69,11 +69,19 @@
 
     export default {
         name: "Download",
+        props: {
+            videos: Array
+        },
         mounted() {
 
+            console.log('videos=', this.videos);
+
+            /*
             window.ipcRenderer.invoke('get-course-videos')
                 .then(videoInfos => console.log('videoInfos=', videoInfos))
                 .catch(err => console.error(err));
+
+             */
         }
     }
 </script>

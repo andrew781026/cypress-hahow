@@ -45,7 +45,9 @@ function createWindow() {
 
     win.on('closed', () => {
         win = null
-    })
+    });
+
+    return win;
 }
 
 // Quit when all windows are closed.
