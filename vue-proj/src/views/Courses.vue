@@ -8,7 +8,7 @@
                     <img class="author-avatar" alt="author-avatar"
                          :src="item.owner.profileImageUrl" :title="item.owner.name"/>
                     <div class="img-container overflow-hidden relative bg-orange-light">
-                        <img id="course-img" :src="item.coverImage.url" alt="course-img">
+                        <img class="course-img" :src="item.coverImage.url" alt="course-img">
                         <div class="ribbon">上課囉</div>
                     </div>
                     <div class="text-container p-12">
@@ -173,15 +173,14 @@
             z-index: 2;
         }
 
-        #course-img {
+        .course-img {
             width: 100%;
-            background-image: url(https://hahow.in/static/media/coursebrief-placeholder.3ba531a3.svg);
             background-size: contain;
             transition: all 0.3s;
         }
 
         &:hover {
-            #course-img {
+            .course-img {
                 transform: scale(1.3);
             }
         }

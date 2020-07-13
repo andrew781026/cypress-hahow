@@ -2,6 +2,7 @@
     <div id="app">
         <hahow-title/>
         <loading-mask/>
+        <light-box :image="lightBoxInfo.imageUrl" :show="lightBoxInfo.show" @close="closeLightBox"/>
         <vue-page-transition name="fade-in-left">
             <router-view/>
         </vue-page-transition>
@@ -11,17 +12,25 @@
 <script>
     import HahowTitle from './components/HahowTitle';
     import LoadingMask from './components/LoadingMask';
-    import {mapActions} from 'vuex';
+    import LightBox from './components/LightBox';
+    import {mapActions, mapGetters} from 'vuex';
 
     export default {
         name: 'App',
         components: {
             'hahow-title': HahowTitle,
             'loading-mask': LoadingMask,
+            'light-box': LightBox,
+        },
+        computed: {
+            ...mapGetters({
+                lightBoxInfo: '[GLOBAL] getLightBoxInfo',
+            }),
         },
         methods: {
             ...mapActions({
                 setInitData: '[MAIN] SET_INIT_DATA',
+                closeLightBox: '[MAIN] HIDE_LIGHT_BOX',
             }),
         },
         mounted() {
