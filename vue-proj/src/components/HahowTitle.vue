@@ -1,21 +1,21 @@
 <template>
     <div class="d-flex w-100 h-44 border-bottom border-top border-dark">
-        <div class="cursor-pointer col-1 d-flex align-items-center border-right border-dark"
+        <div class="px-12 justify-center flex items-center border-right border-dark click-bigger"
              @click="link('GetSystemInfo')">
-            退出
+            <span>退出</span>
         </div>
-        <div class="nav-title-text cursor-pointer col bg-youtube d-flex align-items-center border-right border-dark"
+        <div class="nav-title-text bg-youtube click-bigger"
              @click="link('YoutubeSetting')">
-            <img class="mr-2" src="../assets/youtube-icon.png" alt="youtube-icon" width="40px">
+            <img class="mr-2 w-24" src="../assets/youtube-icon.png" alt="youtube-icon">
             設定 Youtube
         </div>
-        <div class="nav-title-text cursor-pointer col bg-hahow d-flex align-items-center border-right border-dark"
+        <div class="nav-title-text bg-hahow click-bigger"
              @click="link('HahowSetting')">
-            <img class="mr-2" src="../assets/hahow-icon.png" alt="hahow-icon" width="40px">
+            <img class="mr-2 w-24" src="../assets/hahow-icon.png" alt="hahow-icon">
             設定 Hahow
         </div>
-        <div class="nav-title-text cursor-pointer col bg-course d-flex border-right border-dark align-items-center" @click="link('Course')">
-            <img class="mr-2" src="../assets/training.png" alt="course-icon" width="40px">
+        <div class="nav-title-text bg-course click-bigger" @click="link('Course')">
+            <img class="mr-2 w-24" src="../assets/training.png" alt="course-icon">
             我的課程
         </div>
     </div>
@@ -38,10 +38,22 @@
         height: 4.4rem;
     }
 
-    .nav-title-text{
+    .nav-title-text {
         font-weight: 900;
         font-size: 20px;
         color: aliceblue;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        flex-shrink: 0;
+        flex-basis: 0;
+        border-right: 1px solid #343a40;
+        padding-left: 16px;
+    }
+
+    .click-bigger:active {
+        transform: scale(1.1);
     }
 
     .bg-youtube {
