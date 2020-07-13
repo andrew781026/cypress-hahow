@@ -1,7 +1,7 @@
 import {ipcMain} from "electron";
 import HahowUtils from '../utils/hahowUtils';
-import {createWindow} from '../utils/electronUtils';
-import {createFileIfNotExist} from '../utils/ezoomUtils';
+import HttpUtil from '../utils/httpUtil';
+import {createFileIfNotExist, createFolderIfNotExist} from '../utils/ezoomUtils';
 import path from 'path';
 import low from 'lowdb'; // json db
 import FileSync from 'lowdb/adapters/FileSync';
@@ -112,9 +112,19 @@ ipcMain.handle('get-course-videos', async (event, course_id) => {
 });
 
 // 換頁到 Download 顯示課程詳細資訊
-ipcMain.on('show-course-videos',  (event, course_id) => {
+ipcMain.on('show-course-videos', (event, course_id) => {
 
 
+});
+
+
+// 換頁到 Download 顯示課程詳細資訊
+ipcMain.on('download-video', (event, {url, courseId, lectureId}) => {
+
+    const destFolder = path.resolve(__dirname, `../data/videos/${courseId}`);
+    createFolderIfNotExist(destFolder);
+    const cb = info => event.reply('update-download-progress', {...info,lectureId});
+    HttpUtil.videoDownload(url, `${destFolder}/${lectureId}-video.mp4`, cb);
 });
 
 

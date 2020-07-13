@@ -91,8 +91,10 @@ class HahowUtils {
         const data = await HttpUtil.get({url: lectureInfoUrl, token});
 
         return {
+            lectureId,
             imageUrl: data.video.previewImageUrls.VIMEO && data.video.previewImageUrls.VIMEO.DIMENSION_W1000,
             videoUrl: data.video.videos.find(item => item.quality === 'sd' && item.width === 960).link,
+            totalLength: data.video.videos.find(item => item.quality === 'sd' && item.width === 960).size,
             title: data.title
         };
     };

@@ -5,7 +5,7 @@ export const getLocalInfo = () => {
 
     // 參考資料 : https://nodejs.org/dist/latest-v12.x/docs/api/os.html#os_os_networkinterfaces
     const os = require('os');
-    return os.networkInterfaces() ;
+    return os.networkInterfaces();
 };
 
 export const getDnsInfo = () => {
@@ -27,4 +27,10 @@ export const createFileIfNotExist = targetPath => {
         fs.writeFileSync(targetPath, '');
         return 'success create file db.json';
     }
+};
+
+export const createFolderIfNotExist = targetPath => {
+
+    if (fs.existsSync(path.resolve(targetPath))) return 'target folder already exist';
+    else return fs.mkdirSync(path.resolve(targetPath), {recursive: true});
 };

@@ -1,5 +1,6 @@
 <template>
-    <div class="lightbox-root" v-if="show" @click="$emit('close')">
+    <div class="lightbox-root" v-if="show"
+         @click="$emit('close')">
         <img :src="image" alt="圖片">
     </div>
 </template>
@@ -18,6 +19,13 @@
                 default: '',
             },
         },
+        mounted() {
+            this.listener = () => this.$emit('close');
+            window.addEventListener('keydown', this.listener);
+        },
+        beforeDestroy() {
+            window.removeEventListener('keydown', this.listener);
+        }
     }
 </script>
 
