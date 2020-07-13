@@ -1,5 +1,5 @@
 <template>
-    <div class="lightbox-root" v-if="show"
+    <div class="lightbox-root" v-show="show"
          @click="$emit('close')">
         <img :src="image" alt="圖片">
     </div>

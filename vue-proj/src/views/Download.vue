@@ -30,9 +30,10 @@
                 </button>
             </div>
             <div class="flex flex-col ml-6 items-center">
-                <button type="button" class="btn btn-success" @click="downloadVideo(item)">
+                <button type="button" class="btn btn-success" @click="openMp4(item)"
+                        :disabled="item.percent !==100">
                     <img class="img-btn" src="../assets/play-mp4.png" alt="下載">
-                    <span>開啟</span>
+                    <span>撥放</span>
                 </button>
             </div>
         </div>
@@ -78,13 +79,16 @@
                 if (this.videosInfo) {
 
                     const index = this.videosInfo.findIndex(video => video.lectureId === lectureId);
-                    console.log('this.videos=', this.videos);
-                    console.log('index=', index);
                     const singleVideo = this.videosInfo[index];
-                    console.log('percent=', percent);
-                    console.log('singleVideo=', singleVideo);
                     this.videosInfo.splice(index, 1, {...singleVideo, percent, downloadedLength, totalLength});
                 }
+            },
+            openMp4(videoInfo) {
+
+                window.ipcRenderer.send('open-mp4', {
+                    courseId: this.courseId,
+                    lectureId: videoInfo.lectureId
+                });
             }
         },
         data() {

@@ -1,4 +1,5 @@
 import {ipcMain} from "electron";
+import {exec} from 'child_process';
 import HahowUtils from '../utils/hahowUtils';
 import HttpUtil from '../utils/httpUtil';
 import {createFileIfNotExist, createFolderIfNotExist} from '../utils/ezoomUtils';
@@ -7,6 +8,7 @@ import low from 'lowdb'; // json db
 import FileSync from 'lowdb/adapters/FileSync';
 
 let db;
+const openMp4 = filePath => exec(`${filePath}`);
 
 createFileIfNotExist(path.resolve(__dirname, '../data/db.json'));
 
@@ -123,9 +125,17 @@ ipcMain.on('download-video', (event, {url, courseId, lectureId}) => {
 
     const destFolder = path.resolve(__dirname, `../data/videos/${courseId}`);
     createFolderIfNotExist(destFolder);
-    const cb = info => event.reply('update-download-progress', {...info,lectureId});
+    const cb = info => event.reply('update-download-progress', {...info, lectureId});
     HttpUtil.videoDownload(url, `${destFolder}/${lectureId}-video.mp4`, cb);
 });
 
+ipcMain.on('open-mp4', (event, {courseId, lectureId}) => {
+
+    const destFolder = path.resolve(__dirname, `../data/videos/${courseId}`);
+    const targetPath = `${destFolder}/${lectureId}-video.mp4`;
+
+    console.log('targetPath=', targetPath);
+    openMp4(targetPath);
+});
 
 // 下載任務暫停與繼續下載 => 斷點續傳 : https://segmentfault.com/q/1010000019524002
