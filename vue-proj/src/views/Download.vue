@@ -58,6 +58,7 @@
         },
         mounted() {
 
+            document.title = 'Hahow 課程管理器 - 課程影片下載';
             this.videosInfo = [...(this.videos || [])];
             window.ipcRenderer.on('update-download-progress', this.updateProgress);
         },
