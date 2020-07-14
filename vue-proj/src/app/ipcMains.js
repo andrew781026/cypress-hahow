@@ -1,14 +1,14 @@
 import {ipcMain} from "electron";
-import {exec} from 'child_process';
 import HahowUtils from '../utils/hahowUtils';
 import HttpUtil from '../utils/httpUtil';
 import {createFileIfNotExist, createFolderIfNotExist} from '../utils/ezoomUtils';
+import {exec} from 'child_process';
 import path from 'path';
+import fs from "fs";
 import low from 'lowdb'; // json db
 import FileSync from 'lowdb/adapters/FileSync';
 
 let db;
-const openMp4 = filePath => exec(`${filePath}`);
 
 createFileIfNotExist(path.resolve(__dirname, '../data/db.json'));
 
@@ -43,17 +43,6 @@ ipcMain.handle('save-hahowToken', async (event, apiKey) => {
     db.set('hahowToken', apiKey).write();
 
     return 'you save hahow success';
-});
-
-// 顯示上次下載的進度 ,
-ipcMain.handle('get-pre-download-progress', async () => {
-
-    // 直接查看下載資訊的檔案 , 確認此課程有多少沒下載 , 有多少已下載
-
-    // TODO 以下事項
-    // 1. 用 db.json 查出 目前最新的 A 課程相關資訊的 json 檔存哪裡
-    // 2. 查看課程並撥放之
-    // 3. 上傳檔案到 youtube 並形成系列影集並 4.上字幕
 });
 
 // 取得個人購買的所有課程
@@ -101,24 +90,54 @@ ipcMain.handle('get-personal-courses', async () => {
 ipcMain.handle('get-course-videos', async (event, course_id) => {
 
     const token = db.get('hahowToken').value();
+    const filePath = path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`);
 
-    const lectureIds = await HahowUtils.getLectureIdsByCourseId({course_id, token});
+    if (fs.existsSync(filePath)) {
 
-    const videoInfos = await Promise.all(lectureIds.map(lectureId => HahowUtils.getLectureInfo({lectureId, token})));
+        const adapter = new FileSync(path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`));
+        const database = low(adapter);
+        return database.get('videos').value();
 
-    createFileIfNotExist(path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`));
+    } else {
+
+        const lectureIds = await HahowUtils.getLectureIdsByCourseId({course_id, token});
+
+        const videoInfos = await Promise.all(lectureIds.map(lectureId => {
+
+            return HahowUtils.getLectureInfo({lectureId, token});
+        }));
+
+        createFileIfNotExist(filePath);
+        const adapter = new FileSync(path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`));
+        const database = low(adapter);
+        db.defaults({videos: []}).write();
+        database.set('videos', videoInfos).write();
+        return videoInfos;
+    }
+
+});
+
+// 將 MP4 下載完成的資訊存入檔案中
+ipcMain.on('update-videoInfo', (event, args) => {
+
+    const {course_id, lectureId, percent, downloadedLength} = args;
     const adapter = new FileSync(path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`));
     const database = low(adapter);
-    database.setState(videoInfos).write();
-    return videoInfos;
+
+    database.get('videos')
+        .find({lectureId})
+        .assign({percent, downloadedLength})
+        .write();
 });
 
-// 換頁到 Download 顯示課程詳細資訊
-ipcMain.on('show-course-videos', (event, course_id) => {
+ipcMain.on('open-mp4', (event, {courseId, lectureId}) => {
 
+    const openMp4 = filePath => exec(`${filePath}`);
+    const destFolder = path.resolve(__dirname, `../data/videos/${courseId}`);
+    const targetPath = `${destFolder}/${lectureId}-video.mp4`;
 
+    openMp4(targetPath);
 });
-
 
 // 換頁到 Download 顯示課程詳細資訊
 ipcMain.on('download-video', (event, {url, courseId, lectureId}) => {
@@ -127,15 +146,6 @@ ipcMain.on('download-video', (event, {url, courseId, lectureId}) => {
     createFolderIfNotExist(destFolder);
     const cb = info => event.reply('update-download-progress', {...info, lectureId});
     HttpUtil.videoDownload(url, `${destFolder}/${lectureId}-video.mp4`, cb);
-});
-
-ipcMain.on('open-mp4', (event, {courseId, lectureId}) => {
-
-    const destFolder = path.resolve(__dirname, `../data/videos/${courseId}`);
-    const targetPath = `${destFolder}/${lectureId}-video.mp4`;
-
-    console.log('targetPath=', targetPath);
-    openMp4(targetPath);
 });
 
 // 下載任務暫停與繼續下載 => 斷點續傳 : https://segmentfault.com/q/1010000019524002

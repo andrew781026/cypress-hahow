@@ -10,31 +10,37 @@
                 </span>
                 <span>檔名 : <span v-if="item.percent > 0">{{item.lectureId}}-video.mp4</span></span>
                 <div class="progress">
-                    <div :class="['progress-bar', 'w-256',
-                            item.percent !== 100 && 'progress-bar-striped',
-                            item.percent !== 100 && 'progress-bar-animated']"
-                         role="progressbar" :style="{width: `${item.percent || 0}%`}">
+                    <div :class="['progress-bar']"
+                         role="progressbar" :style="{width: `${Math.floor(item.percent || 0)}%`}">
                         {{Math.floor(item.percent || 0)}} %
                     </div>
                 </div>
                 <span>下載量 : {{numberFormatter(item.downloadedLength || 0)}} / {{numberFormatter(item.totalLength)}}</span>
             </div>
             <div class="flex flex-col ml-6 items-center">
-                <button type="button" class="btn btn-primary mb-6">
-                    <img class="img-btn" src="../assets/upload.png" alt="上傳">
-                    <span>上傳</span>
-                </button>
-                <button type="button" class="btn btn-warning mb-6" @click="downloadVideo(item)">
-                    <img class="img-btn" src="../assets/download.png" alt="下載">
-                    <span>下載</span>
-                </button>
-            </div>
-            <div class="flex flex-col ml-6 items-center">
-                <button type="button" class="btn btn-success" @click="openMp4(item)"
-                        :disabled="item.percent !==100">
-                    <img class="img-btn" src="../assets/play-mp4.png" alt="下載">
-                    <span>撥放</span>
-                </button>
+                <template v-if="item.percent !== 100">
+                    <button type="button" class="btn btn-danger mb-6"
+                            v-if="item.downloading">
+                        <img class="img-btn" src="../assets/pause.png" alt="暫停">
+                        <span>暫停</span>
+                    </button>
+                    <button type="button" class="btn btn-danger mb-6"
+                            @click="downloadVideo(item)" v-else>
+                        <img class="img-btn" src="../assets/download.png" alt="下載">
+                        <span>下載</span>
+                    </button>
+                </template>
+                <template v-else>
+                    <button type="button" class="btn btn-primary mb-6">
+                        <img class="img-btn" src="../assets/upload.png" alt="上傳">
+                        <span>上傳</span>
+                    </button>
+                    <button type="button" class="btn btn-success" @click="openMp4(item)"
+                            :disabled="item.percent !== 100">
+                        <img class="img-btn" src="../assets/play-mp4.png" alt="撥放">
+                        <span>撥放</span>
+                    </button>
+                </template>
             </div>
         </div>
     </div>
@@ -80,7 +86,25 @@
 
                     const index = this.videosInfo.findIndex(video => video.lectureId === lectureId);
                     const singleVideo = this.videosInfo[index];
-                    this.videosInfo.splice(index, 1, {...singleVideo, percent, downloadedLength, totalLength});
+                    const newSingleVideo = {
+                        ...singleVideo,
+                        downloading: percent !== 100,
+                        percent,
+                        downloadedLength,
+                        totalLength
+                    };
+                    this.videosInfo.splice(index, 1, newSingleVideo);
+                }
+
+                // 完成下載時 , 更新 video 相關的 db.json 檔案
+                if (percent === 100) {
+
+                    window.ipcRenderer.send('update-videoInfo', {
+                        course_id: this.courseId,
+                        lectureId,
+                        percent,
+                        downloadedLength
+                    });
                 }
             },
             openMp4(videoInfo) {
@@ -114,8 +138,8 @@
     .download-progress-block {
         display: flex;
         flex-direction: column;
-        min-width: 450px;
-        max-width: 450px;
+        min-width: 550px;
+        max-width: 550px;
         margin-left: 10px;
     }
 </style>
