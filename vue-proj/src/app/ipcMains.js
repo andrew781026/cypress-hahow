@@ -1,12 +1,12 @@
 import {ipcMain} from "electron";
 import HahowUtils from '../utils/hahowUtils';
 import HttpUtil from '../utils/httpUtil';
-import {createFileIfNotExist, createFolderIfNotExist} from '../utils/ezoomUtils';
 import {exec} from 'child_process';
 import path from 'path';
 import fs from "fs";
 import low from 'lowdb'; // json db
 import FileSync from 'lowdb/adapters/FileSync';
+import {createFileIfNotExist, createFolderIfNotExist, escapeFileName, getThrottleFunc} from '../utils/ezoomUtils';
 
 let db;
 
@@ -130,22 +130,27 @@ ipcMain.on('update-videoInfo', (event, args) => {
         .write();
 });
 
-ipcMain.on('open-mp4', (event, {courseId, lectureId}) => {
+ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
 
     const openMp4 = filePath => exec(`${filePath}`);
-    const destFolder = path.resolve(__dirname, `../data/videos/${courseId}`);
-    const targetPath = `${destFolder}/${lectureId}-video.mp4`;
+    const destFolder = path.resolve(__dirname, `../data/videos/${escapeFileName(courseTitle)}`);
+    const targetPath = `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`;
 
     openMp4(targetPath);
 });
 
 // 換頁到 Download 顯示課程詳細資訊
-ipcMain.on('download-video', (event, {url, courseId, lectureId}) => {
+ipcMain.on('download-video', (event, {url, courseTitle, lectureId, videoTitle}) => {
 
-    const destFolder = path.resolve(__dirname, `../data/videos/${courseId}`);
+    const destFolder = path.resolve(__dirname, `../data/videos/${escapeFileName(courseTitle)}`);
     createFolderIfNotExist(destFolder);
-    const cb = info => event.reply('update-download-progress', {...info, lectureId});
-    HttpUtil.videoDownload(url, `${destFolder}/${lectureId}-video.mp4`, cb);
+    const cb = info => {
+
+        const throttleId = `download-video-${courseTitle}-${lectureId}`;
+        getThrottleFunc(throttleId,500)(() => event.reply('update-download-progress', {...info, lectureId}));
+    };
+
+    HttpUtil.videoDownload(url, `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`, cb);
 });
 
 // 下載任務暫停與繼續下載 => 斷點續傳 : https://segmentfault.com/q/1010000019524002

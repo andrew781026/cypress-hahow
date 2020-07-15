@@ -20,8 +20,8 @@ download('https://player.vimeo.com/external/180894020.sd.mp4?s=a71775ce12b6d41c4
     })
     .pipe(writeStream);
 */
-videoDownload('https://player.vimeo.com/external/180894020.sd.mp4?s=a71775ce12b6d41c413bbab8c6dff7d858015d0e&profile_id=165',
-    './video.mp4',
+videoDownload('https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
+    './test-video.mp4',
     res => {
 
         const {data, downloadedLength, totalLength} = res;

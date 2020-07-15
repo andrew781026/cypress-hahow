@@ -3,7 +3,7 @@
         <button type="button" class="btn btn-primary ml-12 mt-12" @click="getBoughtCourses">取得我的課程</button>
         <div id="show-courses" class="pl-20 pb-32 flex flex-wrap w-full">
             <template v-for="(item,index) in courses">
-                <div class="relative mr-20 mt-40 course-container" :key="index" @click="getCourseVideos(item._id)">
+                <div class="relative mr-20 mt-40 course-container" :key="index" @click="getCourseVideos(item)">
                     <!-- 課程圖片 -->
                     <img class="author-avatar" alt="author-avatar"
                          :src="item.owner.profileImageUrl" :title="item.owner.name"/>
@@ -62,12 +62,12 @@
 
                 // const course_id = '56189df9df7b3d0b005c6639';
             },
-            getCourseVideos(course_id) {
+            getCourseVideos(course) {
 
                 this.openLoadingMask();
-                window.ipcRenderer.invoke('get-course-videos', course_id)
+                window.ipcRenderer.invoke('get-course-videos', course._id)
                     .then(videos => {
-                        this.$router.push({name: 'Download', params: {videos, courseId: course_id}});
+                        this.$router.push({name: 'Download', params: {videos, course}});
                         this.closeLoadingMask();
                     })
                     .catch(err => console.error(err));

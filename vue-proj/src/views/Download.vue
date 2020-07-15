@@ -8,7 +8,7 @@
                 <span class="truncate" :title="item.title">
                     標題 : {{item.title}}
                 </span>
-                <span>檔名 : <span v-if="item.percent > 0">{{item.lectureId}}-video.mp4</span></span>
+                <span>檔名 : <span v-if="item.percent > 0">{{item.title}}-video.mp4</span></span>
                 <div class="progress">
                     <div :class="['progress-bar']"
                          role="progressbar" :style="{width: `${Math.floor(item.percent || 0)}%`}">
@@ -20,7 +20,7 @@
             <div class="flex flex-col ml-6 items-center">
                 <template v-if="item.percent !== 100">
                     <button type="button" class="btn btn-danger mb-6"
-                            v-if="item.downloading">
+                            v-if="item.isDownloading">
                         <img class="img-btn" src="../assets/pause.png" alt="暫停">
                         <span>暫停</span>
                     </button>
@@ -54,7 +54,7 @@
         name: "Download",
         props: {
             videos: Array,
-            courseId: String,
+            course: Object,
         },
         mounted() {
 
@@ -74,26 +74,33 @@
             downloadVideo(videoInfo) {
                 console.log('start to download video');
 
+                const lectureId = videoInfo.lectureId;
                 window.ipcRenderer.send('download-video', {
                     url: videoInfo.videoUrl,
-                    courseId: this.courseId,
-                    lectureId: videoInfo.lectureId
+                    courseTitle: this.course.title,
+                    lectureId: videoInfo.lectureId,
+                    videoTitle: videoInfo.title,
                 });
-            },
-            updateProgress(event, {lectureId, downloadedLength, totalLength}) {
 
-                const percent = (downloadedLength / totalLength) * 100;
+                // 將 "下載按鈕" 轉變成 "暫停按鈕"
                 if (this.videosInfo) {
 
                     const index = this.videosInfo.findIndex(video => video.lectureId === lectureId);
                     const singleVideo = this.videosInfo[index];
-                    const newSingleVideo = {
-                        ...singleVideo,
-                        downloading: percent !== 100,
-                        percent,
-                        downloadedLength,
-                        totalLength
-                    };
+                    const newSingleVideo = {...singleVideo, isDownloading: true};
+                    this.videosInfo.splice(index, 1, newSingleVideo);
+                }
+            },
+            updateProgress(event, {lectureId, downloadedLength, totalLength}) {
+
+                const percent = (downloadedLength / totalLength) * 100;
+
+                // 更新 下載進度 : percent . downloadedLength
+                if (this.videosInfo) {
+
+                    const index = this.videosInfo.findIndex(video => video.lectureId === lectureId);
+                    const singleVideo = this.videosInfo[index];
+                    const newSingleVideo = {...singleVideo, percent, downloadedLength};
                     this.videosInfo.splice(index, 1, newSingleVideo);
                 }
 
@@ -101,7 +108,7 @@
                 if (percent === 100) {
 
                     window.ipcRenderer.send('update-videoInfo', {
-                        course_id: this.courseId,
+                        course_id: this.course._id,
                         lectureId,
                         percent,
                         downloadedLength
@@ -111,8 +118,8 @@
             openMp4(videoInfo) {
 
                 window.ipcRenderer.send('open-mp4', {
-                    courseId: this.courseId,
-                    lectureId: videoInfo.lectureId
+                    courseTitle: this.course.title,
+                    videoTitle: videoInfo.title
                 });
             }
         },

@@ -18,6 +18,7 @@
     "download": "^8.0.0",
     "lowdb": "^1.0.0",
     "macaddress": "^0.5.1",
+    "sanitize-filename": "^1.6.3",
     "vue": "^2.6.11",
     "vue-page-transition": "^0.2.2",
     "vue-router": "^3.2.0",
