@@ -1,8 +1,10 @@
 <template>
-    <div class="lightbox-root" v-show="show"
-         @click="$emit('close')">
-        <img :src="image" alt="圖片">
-    </div>
+    <transition name="fade">
+        <div class="lightbox-root" v-show="show"
+             @click="$emit('close')">
+            <img :src="image" alt="圖片">
+        </div>
+    </transition>
 </template>
 
 <script>
@@ -46,5 +48,13 @@
     .lightbox-root > img {
         max-height: 90vh;
         max-width: 90vw;
+    }
+
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+
+    .fade-enter, .fade-leave-to {
+        opacity: 0;
     }
 </style>

@@ -93,9 +93,10 @@ class HahowUtils {
         return {
             lectureId,
             imageUrl: data.video.previewImageUrls.VIMEO && data.video.previewImageUrls.VIMEO.DIMENSION_W1000,
-            videoUrl: data.video.videos.find(item => item.quality === 'sd' && item.width === 960).link,
-            totalLength: data.video.videos.find(item => item.quality === 'sd' && item.width === 960).size,
-            title: data.title
+            videoUrl: data.video.videos.find(item => item.quality === 'hd' && item.width === 1920).link,
+            totalLength: data.video.videos.find(item => item.quality === 'hd' && item.width === 1920).size,
+            title: data.title,
+            tempData: data
         };
     };
 }

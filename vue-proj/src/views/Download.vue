@@ -1,5 +1,5 @@
 <template>
-    <div class="root w-full flex flex-col border-collapse overflow-auto">
+    <div class="root">
         <div class="flex justify-start p-12 border border-solid"
              v-for="(item,index) in videosInfo" :key="`download-list-${index}`">
             <img class="cursor-pointer" :src="item.imageUrl" alt="課堂圖片"
@@ -20,6 +20,7 @@
             <div class="flex flex-col ml-6 items-center">
                 <template v-if="item.percent !== 100">
                     <button type="button" class="btn btn-danger mb-6"
+                            @click="pauseDownload(item)"
                             v-if="item.isDownloading">
                         <img class="img-btn" src="../assets/pause.png" alt="暫停">
                         <span>暫停</span>
@@ -31,12 +32,12 @@
                     </button>
                 </template>
                 <template v-else>
-                    <button type="button" class="btn btn-primary mb-6">
+                    <button type="button" class="btn btn-primary mb-6"
+                            @click="uploadVideo(item)">
                         <img class="img-btn" src="../assets/upload.png" alt="上傳">
                         <span>上傳</span>
                     </button>
-                    <button type="button" class="btn btn-success" @click="openMp4(item)"
-                            :disabled="item.percent !== 100">
+                    <button type="button" class="btn btn-success" @click="openMp4(item)">
                         <img class="img-btn" src="../assets/play-mp4.png" alt="撥放">
                         <span>撥放</span>
                     </button>
@@ -121,6 +122,14 @@
                     courseTitle: this.course.title,
                     videoTitle: videoInfo.title
                 });
+            },
+            pauseDownload(videoInfo) {
+                alert('pause 功能尚未實作');
+                console.log('videoInfo=', videoInfo);
+            },
+            uploadVideo(videoInfo) {
+                alert('上傳影片功能尚未實作');
+                console.log('videoInfo=', videoInfo);
             }
         },
         data() {
@@ -135,6 +144,11 @@
 <style scoped>
     .root {
         height: calc(100vh - 4.4rem);
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        border-collapse: collapse; /* 邊框合併為單一邊框 */
     }
 
     .img-btn {

@@ -132,7 +132,7 @@ ipcMain.on('update-videoInfo', (event, args) => {
 
 ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
 
-    const openMp4 = filePath => exec(`${filePath}`);
+    const openMp4 = filePath => exec(`"${filePath}"`);
     const destFolder = path.resolve(__dirname, `../data/videos/${escapeFileName(courseTitle)}`);
     const targetPath = `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`;
 

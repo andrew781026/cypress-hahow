@@ -36,7 +36,7 @@ export const createFolderIfNotExist = targetPath => {
     else return fs.mkdirSync(path.resolve(targetPath), {recursive: true});
 };
 
-export const escapeFileName = fileName => sanitize(fileName, {replacement: '_'});
+export const escapeFileName = fileName => sanitize(fileName, {replacement: '_'}).replace(' ','_');
 
 export function debounce(func, delay) {
     var timer = null;

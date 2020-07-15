@@ -24,7 +24,7 @@ export default new Vuex.Store({
         '[MAIN] OPEN_LOADING_MASK': (state) => state.showMask = true,
         '[MAIN] CLOSE_LOADING_MASK': (state) => state.showMask = false,
         '[MAIN] SHOW_LIGHT_BOX': (state, imageUrl) => state.lightBox = {imageUrl, show: true},
-        '[MAIN] HIDE_LIGHT_BOX': (state) => state.lightBox = {show: false},
+        '[MAIN] HIDE_LIGHT_BOX': (state) => state.lightBox = {show: false, imageUrl: state.lightBox.imageUrl},
     },
     actions: {
         '[MAIN] SET_HAHOW_TOKEN': ({commit}, token) => commit('[MAIN] SET_HAHOW_TOKEN', token),
