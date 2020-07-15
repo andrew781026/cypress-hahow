@@ -12,6 +12,7 @@ let db;
 
 createFileIfNotExist(path.resolve(__dirname, '../data/db.json'));
 
+// 連接到 lowdb 資料檔
 ipcMain.handle('connect-to-json-db', async (event, args) => {
 
     const adapter = new FileSync(path.resolve(__dirname, '../data/db.json'));
@@ -130,6 +131,7 @@ ipcMain.on('update-videoInfo', (event, args) => {
         .write();
 });
 
+// 開啟 MP4 檔案 , 直接觀看
 ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
 
     const openMp4 = filePath => exec(`"${filePath}"`);
@@ -152,5 +154,3 @@ ipcMain.on('download-video', (event, {url, courseTitle, lectureId, videoTitle}) 
 
     HttpUtil.videoDownload(url, `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`, cb);
 });
-
-// 下載任務暫停與繼續下載 => 斷點續傳 : https://segmentfault.com/q/1010000019524002
