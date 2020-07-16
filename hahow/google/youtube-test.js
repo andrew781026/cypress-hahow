@@ -15,13 +15,29 @@ curl \
 // 私人的撥放清單 , 需要用 OAuth 登入後才能取得
 async function runSample() {
 
-    const res = await axios.get('https://www.googleapis.com/youtube/v3/playlistItems',
+    // create playlist
+    const res = await axios.post('https://www.googleapis.com/youtube/v3/playlists',
         {
+            snippet: {
+                title: '',
+                description: '',
+                // tags: [],
+                // defaultLanguage: ''
+            },
+            status: {
+                privacyStatus: "private"
+            },
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${YOUTUBE_TOKEN.ACCESS_TOKEN}`
+            },
             params: {
-                part: 'snippet,contentDetails',// 必填，把需要的資訊列出來
+                part: 'id,snippet,contentDetails',// 必填，把需要的資訊列出來
                 playlistId: 'PLnPLskqK8ToDKWUBK_IoXOXe8RkV2qaXm',// 播放清單的id
                 maxResults: 50,// 預設為五筆資料，可以設定1~50
-                key: YOUTUBE_TOKEN.TOKEN, // 使用 API 只能取得公開的播放清單
+                key: YOUTUBE_TOKEN.API_KEY, // 使用 API 只能取得公開的播放清單
+                managedByMe: true,
             }
         });
 
