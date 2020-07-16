@@ -4,6 +4,18 @@ var readline = require('readline');
 var {google} = require('googleapis');
 var OAuth2 = google.auth.OAuth2;
 
+/*
+* The YouTube Data API uses the following scopes:
+*  Scopes
+*  https://www.googleapis.com/auth/youtube	Manage your YouTube account
+*  https://www.googleapis.com/auth/youtube.channel-memberships.creator	See a list of your current active channel members, their current level, and when they became a member
+*  https://www.googleapis.com/auth/youtube.force-ssl	See, edit, and permanently delete your YouTube videos, ratings, comments and captions
+*  https://www.googleapis.com/auth/youtube.readonly	View your YouTube account
+*  https://www.googleapis.com/auth/youtube.upload	Manage your YouTube videos
+*  https://www.googleapis.com/auth/youtubepartner	View and manage your assets and associated content on YouTube
+*  https://www.googleapis.com/auth/youtubepartner-channel-audit	View private information of your YouTube channel relevant during the audit process with a YouTube partner
+* */
+
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/youtube-nodejs-quickstart.json
 var SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
@@ -32,6 +44,7 @@ function authorize(credentials, callback) {
     var clientId = credentials.web.client_id;
     var redirectUrl = credentials.web.redirect_uris[0];
     var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
+    // https://accounts.google.com/signin/oauth/danger?authuser=0&part=AJi8hAOw3iC_jV9mrDVAzaizrQeKcdnP2ioR56t38TmOkN3K4R5n9f16M1dmD3wRp5w5DihMINEs04r2ty8AGL6hpln156U3RYpQPOHQXXNO_UbVffFpS48YSU1ElfxtC_8bdja3mJGfrr70IF_6PzvQWhbWUF9Lah8IjS7cxatY5dgVGatPJ8lW9dYzLr4zZtiEMUMptGPX2oPpunxCQ5VD-LeqJDtCAYPtu0cOCMx13EFXdJgS9CurmltR8ZPa_AXzhcqMIo1rCuTzEHF5mVhEL0yNMatqT4pXNHkJp7J1tPPEnyMXcSCNH-xJX6qpfoOZQ80p5fEr8bkg5xtAlItk1WYcuar-v70uPoIwlFuma-HNiFnlzE7KmkpD0es6-ui_jjF1cBEfmlImPREItcxQU1rSYBkvYRLx8MSxhLLdkdYNLxr-CIZwxLfKI7u_YSZd374wm5CZlARc-FwA3DS7zhSJbJD0RIcyHtwsvlHWbDeQUnv72eai4EOBWOYqkD_Ry24y4DMygOensnj6kp3V2rfyMOKhVn371gifklhN7lv8bMkLLDiFygjqgYnvhXstAqGzisAjUn6RFda2n03PNP-ykLH6yw&hl=zh-TW&as=lLEK3Fcf9XMqQkO8f3J1vA&rapt=AEjHL4Ph9H48CoSHFFjz341qoffAQ17zK1QqHmITE7YhdOUOwxRYbNBumMbJ2-KLjjzsmBT5VyDZopGhNJlkL2nb-T8rJiduyw#
 
     // Check if we have previously stored a token.
     fs.readFile(TOKEN_PATH, function (err, token) {
