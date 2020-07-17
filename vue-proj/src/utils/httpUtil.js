@@ -16,6 +16,22 @@ const HttpUtil = {
         return await response.data;
     },
     download,
+    async checkVideoExist(url) {
+
+        try {
+
+            await Axios({method: "HEAD", url}); // 使用 HEAD method 去確認是否存在
+            return true; // video exist on input url
+
+        } catch (err) {
+
+            if (err && err.response && err.response.status === 410) {
+
+                return false; // statusCode = 410 Gone
+
+            } else throw err;
+        }
+    },
     videoDownload: (url, dest, cb) => {
 
         return new Promise((resolve, reject) => {

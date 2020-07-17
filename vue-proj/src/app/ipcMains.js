@@ -1,60 +1,52 @@
 import {ipcMain} from "electron";
 import HahowUtils from '../utils/hahowUtils';
+import DbUtils from '../utils/dbUtils';
 import HttpUtil from '../utils/httpUtil';
 import {exec} from 'child_process';
 import path from 'path';
 import fs from "fs";
-import low from 'lowdb'; // json db
-import FileSync from 'lowdb/adapters/FileSync';
-import {createFileIfNotExist, createFolderIfNotExist, escapeFileName, getThrottleFunc} from '../utils/ezoomUtils';
-
-let db;
-
-createFileIfNotExist(path.resolve(__dirname, '../data/db.json'));
+import {createFolderIfNotExist, escapeFileName, getThrottleFunc} from '../utils/ezoomUtils';
 
 // 連接到 lowdb 資料檔
 ipcMain.handle('connect-to-json-db', async (event, args) => {
 
-    const adapter = new FileSync(path.resolve(__dirname, '../data/db.json'));
-    db = low(adapter);
+    const db = DbUtils.getDataBase({
+        filePath: path.resolve(__dirname, '../data/db.json'),
+        defaultJson: {youtubeToken: '', hahowToken: '', courses: []}
+    });
 
-    // Set some defaults (required if your JSON file is empty)
-    db.defaults({youtubeToken: '', hahowToken: '', courses: []}).write();
-
+    DbUtils.setGlobalDB(db);
     return 'connect done !';
 });
 
 ipcMain.handle('get-json-db-all-info', (event, args) => {
 
-    return db.getState(); // { youtubeToken: '', hahowToken: '', courses: [] }
+    return DbUtils.getGlobalDB().getState(); // { youtubeToken: '', hahowToken: '', courses: [] }
 });
 
 // .handle method can return result to ipcRenderer.invoke
 ipcMain.handle('save-youtubeToken', async (apiKey) => {
 
-    // Increment count
-    db.update('youtubeToken', apiKey).write();
-
+    DbUtils.setYoutubeToken(apiKey);
     return 'you save youtube success';
 });
 
 // .handle method can return result to ipcRenderer.invoke
 ipcMain.handle('save-hahowToken', async (event, apiKey) => {
 
-    db.set('hahowToken', apiKey).write();
-
+    DbUtils.setHahowToken(apiKey);
     return 'you save hahow success';
 });
 
 // 取得個人購買的所有課程
 ipcMain.handle('get-personal-courses', async () => {
 
-    const token = db.get('hahowToken').value();
+    const token = DbUtils.getHahowToken();
     if (!token) throw new Error('hahow token not exist error');
     else {
 
         const courses = await HahowUtils.getBoughtCourses({token});
-        db.set('courses', courses).write();
+        DbUtils.setCourses(courses);
 
         /*
           the response of courses data :
@@ -90,40 +82,46 @@ ipcMain.handle('get-personal-courses', async () => {
 // 取得課程詳細資訊
 ipcMain.handle('get-course-videos', async (event, course_id) => {
 
-    const token = db.get('hahowToken').value();
+    const token = DbUtils.getHahowToken();
     const filePath = path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`);
+
+    // 取得課程資訊
+    const lectureIds = await HahowUtils.getLectureIdsByCourseId({course_id, token});
+    const videoInfos = await Promise.all(lectureIds.map(lectureId => HahowUtils.getLectureInfo({lectureId, token})));
+
+    const database = DbUtils.getDataBase({
+        filePath,
+        defaultJson: {videos: []}
+    });
 
     if (fs.existsSync(filePath)) {
 
-        const adapter = new FileSync(path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`));
-        const database = low(adapter);
-        return database.get('videos').value();
+        // 如果已有課程資訊 , 將新舊資訊做整合
+        const oldVideoInfos = database.get('videos').value();
+
+        // 將 oldVideoInfos 中的 percent, downloadedLength 欄位作保留 , 其他的欄位用新的
+        const mergedVideoInfos = videoInfos.map(videoInfo => {
+
+            const oldVideoInfo = oldVideoInfos.find(({lectureId}) => lectureId === videoInfo.lectureId);
+            return {...oldVideoInfo, ...videoInfo}
+        });
+
+        database.set('videos', mergedVideoInfos).write();
+        return mergedVideoInfos;
 
     } else {
 
-        const lectureIds = await HahowUtils.getLectureIdsByCourseId({course_id, token});
-
-        const videoInfos = await Promise.all(lectureIds.map(lectureId => {
-
-            return HahowUtils.getLectureInfo({lectureId, token});
-        }));
-
-        createFileIfNotExist(filePath);
-        const adapter = new FileSync(path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`));
-        const database = low(adapter);
-        db.defaults({videos: []}).write();
         database.set('videos', videoInfos).write();
         return videoInfos;
     }
-
 });
 
 // 將 MP4 下載完成的資訊存入檔案中
 ipcMain.on('update-videoInfo', (event, args) => {
 
     const {course_id, lectureId, percent, downloadedLength} = args;
-    const adapter = new FileSync(path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`));
-    const database = low(adapter);
+    const filePath = path.resolve(__dirname, `../data/course_${course_id}-videoInfos.json`);
+    const database = DbUtils.getDataBase({filePath});
 
     database.get('videos')
         .find({lectureId})
@@ -142,15 +140,48 @@ ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
 });
 
 // 換頁到 Download 顯示課程詳細資訊
-ipcMain.on('download-video', (event, {url, courseTitle, lectureId, videoTitle}) => {
+ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, videoTitle}) => {
 
-    const destFolder = path.resolve(__dirname, `../data/videos/${escapeFileName(courseTitle)}`);
-    createFolderIfNotExist(destFolder);
-    const cb = info => {
+    const downloadVideo = (videoUrl) => {
 
-        const throttleId = `download-video-${courseTitle}-${lectureId}`;
-        getThrottleFunc(throttleId,500)(() => event.reply('update-download-progress', {...info, lectureId}));
+        const destFolder = path.resolve(__dirname, `../data/videos/${escapeFileName(courseTitle)}`);
+        createFolderIfNotExist(destFolder);
+        const cb = info => {
+
+            const throttleId = `download-video-${courseTitle}-${lectureId}`;
+            getThrottleFunc(throttleId, 500)(() => event.reply('update-download-progress', {...info, lectureId}));
+        };
+
+        return HttpUtil.videoDownload(videoUrl, `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`, cb);
     };
 
-    HttpUtil.videoDownload(url, `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`, cb);
+    const getLectureInfo = async (lectureId, courseId) => {
+
+        const token = DbUtils.getHahowToken();
+        const lectureInfo = await HahowUtils.getLectureInfo({lectureId, token});
+        const filePath = path.resolve(__dirname, `../data/course_${courseId}-videoInfos.json`);
+        const database = DbUtils.getDataBase({filePath});
+
+        database.get('videos')
+            .find({lectureId})
+            .assign(lectureInfo)
+            .write();
+
+        return lectureInfo;
+    };
+
+    const getNewUrlToDownloadVideo = async (lectureId, courseId) => {
+
+        const {videoUrl} = await getLectureInfo(lectureId, courseId);
+        return downloadVideo(videoUrl);
+    }
+
+    // 確認 videoUrl 是否有效 , 當 videoUrl 無效時 ( HEAD method 呼叫 url 會回傳 statusCode = 410 Gone ) , 需要取得一個新的
+    HttpUtil.checkVideoExist(url)
+        .then(videoExist => {
+            if (videoExist) downloadVideo(url);
+            else getNewUrlToDownloadVideo(lectureId, courseId);
+        })
+        .then(data => console.log('data=', data))
+        .catch(err => console.error(err));
 });

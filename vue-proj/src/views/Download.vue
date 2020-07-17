@@ -79,6 +79,7 @@
                 window.ipcRenderer.send('download-video', {
                     url: videoInfo.videoUrl,
                     courseTitle: this.course.title,
+                    courseId: this.course._id,
                     lectureId: videoInfo.lectureId,
                     videoTitle: videoInfo.title,
                 });
