@@ -5,6 +5,10 @@
 製作 youtube 撥放清單 ,  
 然後在 APP 中進行觀看  
 
+## 桌面 APP 
+
+目前完整 Electron App 在 vue-proj 資料夾中
+
 ## 里程碑
 
 1. 特定網址 , 抓出 hahow 上的影片

@@ -225,13 +225,13 @@ async function getPlayListById({access_token, api_key, playlistId = 'PLW5vcWZJoR
 }
 
 const scopes = [
-    // 'https://www.googleapis.com/auth/youtube.readonly', // scope for get playlist . video ...etc.
     'https://www.googleapis.com/auth/youtube' // scope for add playlist
 ];
+
 authenticate(scopes)
-    // .then(addPlayList)
-    .then(addVideo)
-    .then(addVideoToPlayList)
+    .then(addPlayList)
+    // .then(addVideo)
+    // .then(addVideoToPlayList)
     // .then(getMyPlayList)
     // .then(getPlayListById)
     .catch(console.error);
