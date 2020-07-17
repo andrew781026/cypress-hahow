@@ -7,13 +7,25 @@
 
 ## 桌面 APP 
 
-目前完整 Electron App 在 vue-proj 資料夾中
+目前完整 Electron App 在 vue-proj 資料夾中 
+
+可用 `electron:serve` 開啟
+
+截圖 
+
+![](https://i.imgur.com/NSBoLfg.png)
+
+![](https://i.imgur.com/nWLQsoD.png)
+
+![](https://i.imgur.com/cfbvsuq.png)
+
 
 ## 里程碑
 
-1. 特定網址 , 抓出 hahow 上的影片
-2. 上傳到私人 youtube 影片
-3. 爬蟲整批課程 
+1. 利用 hahow restful api 取得影片 URL => 完成
+2. 下載影片到筆電中 => 完成
+3. 上傳到私人 youtube 的撥放清單
+4. 追加字幕
 
 ## 其他可學習 
 
