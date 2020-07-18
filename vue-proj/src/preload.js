@@ -11,15 +11,12 @@ window.ipcRenderer = ipcRenderer;
 // It has the same sandbox as a Chrome extension.
 window.addEventListener('DOMContentLoaded', () => {
 
-    /*
-       ipcRenderer.eventNames() lists all channels that have listeners
-       ipcRenderer.rawListeners(channel) lists all listeners for a particular channel
-       ipcRenderer.eventNames().forEach(channel => ipcRenderer.rawListeners(channel))
-    */
-
     // setting many function on windows
-
     const registerFuncs = {};
+
+    // the relate methods of **Electron Windows Badge**
+    registerFuncs.updateBadge = (badge) => ipcRenderer.send('update-badge', badge);
+    registerFuncs.removeBadge = () => ipcRenderer.send('update-badge', null);
 
     registerFuncs.appendText = (text) => {
 

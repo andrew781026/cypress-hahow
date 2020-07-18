@@ -1,4 +1,5 @@
 import {app, protocol, BrowserWindow} from 'electron';
+import Badge from 'electron-windows-badge';
 import path from 'path';
 
 import {
@@ -33,6 +34,9 @@ function createWindow() {
         }
     });
 
+    // Remove the window's menu bar.
+    win.removeMenu();
+
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         // Load the url of the dev server if in development mode
         win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
@@ -46,6 +50,19 @@ function createWindow() {
     win.on('closed', () => {
         win = null
     });
+
+    // 設定進度條
+    win.setProgressBar(0.5);
+
+    // 設定數字小圖示
+    const badgeOptions = {};
+    new Badge(win, badgeOptions);
+
+    // 3) To update the badge you just need to call this(you must do it in render process):
+    // ipcRenderer.sendSync('update-badge', 1);
+
+    // 4) To remove badge just call this(you must do it in render process):
+    // ipcRenderer.sendSync('update-badge', null);
 
     return win;
 }

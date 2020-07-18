@@ -40,6 +40,8 @@
                 .then(() => window.ipcRenderer.invoke('get-json-db-all-info'))
                 .then(this.setInitData)
                 .catch(err => console.error(err));
+
+            window.registerFuncs.updateBadge(3);
         }
     }
 </script>

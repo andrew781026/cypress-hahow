@@ -1,8 +1,7 @@
-import {ipcMain} from "electron";
+import {ipcMain,shell} from "electron";
 import HahowUtils from '../utils/hahowUtils';
 import DbUtils from '../utils/dbUtils';
 import HttpUtil from '../utils/httpUtil';
-import {exec} from 'child_process';
 import path from 'path';
 import fs from "fs";
 import {createFolderIfNotExist, escapeFileName, getThrottleFunc} from '../utils/ezoomUtils';
@@ -132,11 +131,11 @@ ipcMain.on('update-videoInfo', (event, args) => {
 // 開啟 MP4 檔案 , 直接觀看
 ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
 
-    const openMp4 = filePath => exec(`"${filePath}"`);
     const destFolder = path.resolve(__dirname, `../data/videos/${escapeFileName(courseTitle)}`);
     const targetPath = `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`;
 
-    openMp4(targetPath);
+    // Open the given file in the desktop's default manner.
+    shell.openPath(targetPath);
 });
 
 // 換頁到 Download 顯示課程詳細資訊
