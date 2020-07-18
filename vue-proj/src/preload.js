@@ -13,6 +13,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // setting many function on windows
     const registerFuncs = {};
+    // 將設定的 function 掛載到 window 上
+    window.registerFuncs = registerFuncs;
 
     // the relate methods of **Electron Windows Badge**
     registerFuncs.updateBadge = (badge) => ipcRenderer.send('update-badge', badge);
@@ -45,6 +47,4 @@ window.addEventListener('DOMContentLoaded', () => {
     // dns.getServers , 參考資料 : https://nodejs.org/api/dns.html#dns_dns_getservers
     registerFuncs.getDnsServers = () => dns.getServers();
 
-    // 將設定的 function 掛載到 window 上
-    window.registerFuncs = registerFuncs;
 });

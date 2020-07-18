@@ -9,17 +9,37 @@ class DbUtils {
 
     // globalDB;
 
-    static setGlobalDB = db => globalDB = db;
-    static getGlobalDB = () => globalDB;
+    static setGlobalDB(db) {
+        globalDB = db;
+    }
 
-    static setYoutubeToken = apiKey => globalDB.set('youtubeToken', apiKey).write();
-    static getYoutubeToken = () => globalDB.get('youtubeToken').value();
+    static getGlobalDB() {
+        return globalDB;
+    }
 
-    static setHahowToken = token => globalDB.set('hahowToken', token).write();
-    static getHahowToken = () => globalDB.get('hahowToken').value();
+    static setYoutubeToken(apiKey) {
+        globalDB.set('youtubeToken', apiKey).write();
+    }
 
-    static setCourses = courses => globalDB.set('courses', courses).write();
-    static getCourses = () => globalDB.get('courses').value();
+    static getYoutubeToken() {
+        return globalDB.get('youtubeToken').value();
+    }
+
+    static setHahowToken(token) {
+        globalDB.set('hahowToken', token).write();
+    }
+
+    static getHahowToken(token) {
+        return globalDB.get('hahowToken').value();
+    }
+
+    static setCourses(courses) {
+        globalDB.set('courses', courses).write();
+    }
+
+    static getCourses() {
+        return globalDB.get('courses').value();
+    }
 
     static getDataBase({filePath, defaultJson = {}}) {
 

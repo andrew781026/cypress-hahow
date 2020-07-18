@@ -41,7 +41,8 @@
                 .then(this.setInitData)
                 .catch(err => console.error(err));
 
-            window.registerFuncs.updateBadge(3);
+            // window.registerFuncs.updateBadge(3);
+            setTimeout(() => window.registerFuncs.updateBadge(3), 1000);
         }
     }
 </script>
