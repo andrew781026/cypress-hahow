@@ -34,24 +34,29 @@ const HttpUtil = {
     },
     videoDownload: (url, dest, cb) => {
 
-        return new Promise((resolve, reject) => {
+        let downloadedLength = 0;
+        const writeStream = fs.createWriteStream(dest);
+        // writeStream.on("finish", () => resolve('you success download the video'));
+        // writeStream.on("error", err => reject(err));
 
-            let downloadedLength = 0;
-            const writeStream = fs.createWriteStream(dest);
-            writeStream.on("finish", () => resolve('you success download the video'));
-            writeStream.on("error", err => reject(err));
+        const duplexStream = download(url);
 
-            download(url)
-                .on('response', res => {
-                    const totalLength = res.headers['content-length'];
+        duplexStream.on('response', res => {
+            const totalLength = res.headers['content-length'];
 
-                    res.on('data', data => {
-                        downloadedLength += data.length;
-                        cb({data, downloadedLength, totalLength});
-                    });
-                })
-                .pipe(writeStream);
+            res.on('data', data => {
+                downloadedLength += data.length;
+                cb({data, downloadedLength, totalLength});
+            });
         });
+
+        duplexStream.on("error", err => console.error(err));
+
+        duplexStream.pipe(writeStream);
+
+        // duplexStream.pause();  // 下載暫停
+        // duplexStream.resume(); // 下載繼續
+        return duplexStream;
     }
 };
 

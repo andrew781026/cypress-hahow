@@ -1,4 +1,4 @@
-import {ipcMain,shell} from "electron";
+import {ipcMain, shell} from "electron";
 import HahowUtils from '../utils/hahowUtils';
 import DbUtils from '../utils/dbUtils';
 import HttpUtil from '../utils/httpUtil';
@@ -138,6 +138,27 @@ ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
     shell.openPath(targetPath);
 });
 
+const downloadStreams = {};
+
+
+ipcMain.handle('pause-download-video', (event, url) => {
+
+    const duplexStream = downloadStreams[url];
+    return duplexStream.pause(); // 暫停下載
+});
+
+ipcMain.handle('resume-download-video', (event, url) => {
+
+    const duplexStream = downloadStreams[url];
+    return duplexStream.resume(); // 繼續下載
+});
+
+ipcMain.handle('cancel-download-video', (event, url) => {
+
+    const duplexStream = downloadStreams[url];
+    return duplexStream.cancel(); // .finished(); // 取消下載
+});
+
 // 換頁到 Download 顯示課程詳細資訊
 ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, videoTitle}) => {
 
@@ -181,6 +202,9 @@ ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, vid
             if (videoExist) downloadVideo(url);
             else getNewUrlToDownloadVideo(lectureId, courseId);
         })
-        .then(data => console.log('data=', data))
+        .then(duplexStream => {
+            console.log('duplexStream=', duplexStream);
+            downloadStreams[url] = duplexStream;
+        })
         .catch(err => console.error(err));
 });
