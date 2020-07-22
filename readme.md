@@ -37,6 +37,11 @@ https://blog.typeart.cc/using-puppeteer-crawler-common-skills/
 
 ## 好用的套件 
 
+### 將 .mp4 轉成 .gif
+- [Converting Android Videos to Animated GIF Images With Cloudinary: A Tutorial](https://cloudinary.com/blog/converting_android_videos_to_animated_gif_images_with_cloudinary_a_tutorial)
+- [gifify](https://www.npmjs.com/package/gifify)
+- [node-canvas](https://www.npmjs.com/package/canvas)
+
 ### [Tmp](https://www.npmjs.com/package/tmp)
 A simple temporary file and directory creator for node.js.
 
