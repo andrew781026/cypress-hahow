@@ -155,8 +155,10 @@ ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
     shell.openPath(targetPath);
 });
 
-const downloadStreams = {};
+// 用瀏覽器開啟指定的 URL
+ipcMain.on('open-url', (event, url) => shell.openExternal(url));
 
+const downloadStreams = {};
 
 ipcMain.handle('pause-download-video', (event, url) => {
 
