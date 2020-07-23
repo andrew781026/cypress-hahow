@@ -1,5 +1,5 @@
 import {app, protocol, BrowserWindow} from 'electron';
-// import Badge from 'electron-windows-badge';
+import Badge from 'electron-windows-badge';
 import path from 'path';
 
 import {
@@ -55,8 +55,8 @@ function createWindow() {
     win.setProgressBar(0.5);
 
     // 設定數字小圖示
-    // const badgeOptions = {};
-    // new Badge(win, badgeOptions);
+    const badgeOptions = {};
+    new Badge(win, badgeOptions);
 
     // 3) To update the badge you just need to call this(you must do it in render process):
     // ipcRenderer.sendSync('update-badge', 1);

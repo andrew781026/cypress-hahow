@@ -6,7 +6,6 @@ import HttpUtil from '../utils/httpUtil';
 import path from 'path';
 import fs from "fs";
 import {createFolderIfNotExist, escapeFileName, getThrottleFunc} from '../utils/ezoomUtils';
-import {google} from "googleapis";
 
 // 連接到 lowdb 資料檔
 ipcMain.handle('connect-to-json-db', async (event, args) => {
@@ -22,7 +21,7 @@ ipcMain.handle('connect-to-json-db', async (event, args) => {
 
 ipcMain.handle('get-json-db-all-info', (event, args) => {
 
-    return DbUtils.getGlobalDB().getState(); // { youtubeToken: '', hahowToken: '', courses: [] }
+    return DbUtils.getGlobalDB().getState();
 });
 
 ipcMain.handle('google-login', async (event, {clientId, clientSecret}) => {
@@ -37,8 +36,15 @@ ipcMain.handle('google-login', async (event, {clientId, clientSecret}) => {
         saveToken: tokens => DbUtils.updateGoogleOAuth2Info({tokens})
     });
 
-    const tokens = await oauth2Util.openAuthPageAndGetAuthorizationCode(savedTokens);
-    return tokens;
+    try {
+
+        const tokens = await oauth2Util.openAuthPageAndGetAuthorizationCode(savedTokens);
+        return {...tokens, googleApis: null};
+
+    } catch (e) {
+        console.error(e);
+    }
+
 });
 
 // .handle method can return result to ipcRenderer.invoke

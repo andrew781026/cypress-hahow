@@ -1,10 +1,13 @@
-import http from 'http';
-import url from 'url';
-import opn from 'open';
-
-import {google} from 'googleapis';
+const http = require('http');
+const url = require('url');
+const opn = require('open');
+const {google} = require('googleapis');
 
 class GoogleOAuth2Util {
+
+    oauth2Client;
+    scopes;
+    redirectPort;
 
     constructor({clientId, clientSecret, scopes = [], redirectPort = 3000, saveToken}) {
 
@@ -16,16 +19,18 @@ class GoogleOAuth2Util {
             `http://localhost:${redirectPort}/oauth2callback`
         );
 
-        GoogleOAuth2Util.setGlobalAuth(this.oauth2Client);
+        this.setGlobalAuth();
 
         saveToken && this.oauth2Client.on('tokens', saveToken); // 儲存 oauth2Client 用的 token
     }
 
-    static setGlobalAuth(oauth2Client) {
-        google.options({auth: oauth2Client})
+    setGlobalAuth() {
+
+        // This is one of the many ways you can configure googleapis to use authentication credentials.  In this method, we're setting a global reference for all APIs.  Any other API you use here, like google.drive('v3'), will now use this auth client. You can also override the auth client at the service and method call levels.
+        google.options({auth: this.oauth2Client});
     }
 
-    static renderRedirectHtml(tokens = {}) {
+    renderRedirectHtml(tokens = {}) {
 
         const {expiry_date, access_token, refresh_token} = tokens;
 
@@ -46,7 +51,7 @@ class GoogleOAuth2Util {
                 </table>`;
     }
 
-    generateAuthUrl() {
+    generateAuthUrl = () => {
 
         const redirectPort = this.redirectPort;
         const oauth2Client = this.oauth2Client;
@@ -55,44 +60,42 @@ class GoogleOAuth2Util {
         return oauth2Client.generateAuthUrl({
             access_type: 'offline',
             scope: scopes.join(' '),
-            // prompt: 'consent', // add prompt: 'consent' to ger refresh_token
+            prompt: 'consent', // add prompt: 'consent' to ger refresh_token
             redirect_uri: `http://localhost:${redirectPort}/oauth2callback`
         });
-    }
+    };
 
-    static setOauth2Tokens(oauth2Client, tokens) {
-        oauth2Client.setCredentials(tokens)
-    }
+    setOauth2Tokens = (tokens) => this.oauth2Client.setCredentials(tokens);
 
-    static getOauth2Client(tokens, options) {
+    getOauth2Client = (tokens, options) => {
 
         const oauth2Client = new google.auth.OAuth2(options);
         oauth2Client.setCredentials(tokens);
 
         return oauth2Client;
-    }
+    };
 
-    static getGoogleApis(tokens) {
+    getGoogleApis = (tokens) => {
 
         const oauth2Client = new google.auth.OAuth2();
         oauth2Client.setCredentials(tokens);
         google.options({auth: oauth2Client});
 
         return google;
-    }
+    };
 
-    openAuthPageAndGetAuthorizationCode(savedTokens) {
+    openAuthPageAndGetAuthorizationCode = (savedTokens) => {
 
         // grab the url that will be used for authorization
         const authorizeUrl = this.generateAuthUrl();
         const redirectPort = this.redirectPort;
         const oauth2Client = this.oauth2Client;
-        const renderRedirectHtml = GoogleOAuth2Util.renderRedirectHtml;
-        const setOauth2Tokens = GoogleOAuth2Util.setOauth2Tokens;
+        const renderRedirectHtml = this.renderRedirectHtml;
+        const setOauth2Tokens = this.setOauth2Tokens;
 
         if (savedTokens) {
 
-            setOauth2Tokens(oauth2Client, savedTokens);
+            setOauth2Tokens(savedTokens);
             return {...savedTokens, googleApis: google};
 
         } else {
@@ -110,7 +113,7 @@ class GoogleOAuth2Util {
                                     // show access_token and api_key to html
                                     res.end(renderRedirectHtml(tokens));
 
-                                    setOauth2Tokens(oauth2Client, tokens);
+                                    setOauth2Tokens(tokens);
                                     resolve({
                                         access_token: tokens.access_token,
                                         refresh_token: tokens.refresh_token,
@@ -141,4 +144,13 @@ class GoogleOAuth2Util {
     }
 }
 
-export default GoogleOAuth2Util;
+const oauth2Util = new GoogleOAuth2Util({
+    clientId: "523222890174-t6a777js4s614faepfvjfpj6vbufnve7.apps.googleusercontent.com",
+    clientSecret: "2sGqzoJgr6kQHil6VlQtV0x7",
+    scopes: ['https://www.googleapis.com/auth/youtube'], // scope for add playlist . upload video ...
+    saveToken: tokens => console.log('saveToken , tokens=', tokens)
+});
+
+oauth2Util.openAuthPageAndGetAuthorizationCode()
+    .then(tokens => console.log('tokens=', tokens))
+    .catch(err => console.error(err));

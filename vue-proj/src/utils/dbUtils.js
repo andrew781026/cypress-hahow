@@ -5,53 +5,33 @@ import {createFileIfNotExist} from './ezoomUtils';
 
 let globalDB; // globalDB 會再開啟 APP 後載入
 
-class DbUtils {
+const DbUtils = {
 
-    // globalDB;
+    setGlobalDB: db => globalDB = db,
 
-    static setGlobalDB(db) {
-        globalDB = db;
-    }
+    getGlobalDB: () => globalDB,
 
-    static getGlobalDB() {
-        return globalDB;
-    }
+    setGoogleOAuth2Info: oauth2Info => globalDB.set('google', oauth2Info).write(),
 
-    static setGoogleOAuth2Info(oAuth2Info) {
-        globalDB.set('google', oAuth2Info).write();
-    }
+    updateGoogleOAuth2Info: oauth2Info => globalDB.assign('google', oauth2Info).write(),
 
-    static updateGoogleOAuth2Info(oAuth2Info) {
-        globalDB.assign('google', oAuth2Info).write();
-    }
+    getGoogleOAuth2Info: () => globalDB.get('google').value(),
 
-    static getGoogleOAuth2Info() {
-        return globalDB.get('google').value();
-    }
-
-    static getSavedTokens() {
+    getSavedTokens: () => {
 
         const googleOAuth2Info = globalDB.get('google').value();
         return googleOAuth2Info && googleOAuth2Info.tokens;
-    }
+    },
 
-    static setHahowToken(token) {
-        globalDB.set('hahowToken', token).write();
-    }
+    setHahowToken: token => globalDB.set('hahowToken', token).write(),
 
-    static getHahowToken(token) {
-        return globalDB.get('hahowToken').value();
-    }
+    getHahowToken: () => globalDB.get('hahowToken').value(),
 
-    static setCourses(courses) {
-        globalDB.set('courses', courses).write();
-    }
+    setCourses: courses => globalDB.set('courses', courses).write(),
 
-    static getCourses() {
-        return globalDB.get('courses').value();
-    }
+    getCourses: () => globalDB.get('courses').value(),
 
-    static getDataBase({filePath, defaultJson = {}}) {
+    getDataBase: ({filePath, defaultJson = {}}) => {
 
         if (fs.existsSync(filePath)) {
 
@@ -69,7 +49,7 @@ class DbUtils {
 
             return db;
         }
-    }
+    },
 }
 
 export default DbUtils;
