@@ -5,7 +5,11 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        youtubeToken: '',
+        google: {
+            tokens: null,
+            clientId: '',
+            clientSecret: ''
+        },
         hahowToken: '',
         showMask: false,
         lightBox: {}
@@ -13,10 +17,11 @@ export default new Vuex.Store({
     getters: {
         '[GLOBAL] getLoadingBlockOpen': (state) => state.showMask,
         '[GLOBAL] getLightBoxInfo': (state) => state.lightBox,
+        '[GLOBAL] getAccessToken': (state) => state.google.tokens && state.google.tokens.access_token,
     },
     mutations: {
         '[MAIN] SET_HAHOW_TOKEN': (state, token) => state.hahowToken = token,
-        '[MAIN] SET_YOUTUBE_TOKEN': (state, token) => state.youtubeToken = token,
+        '[MAIN] SET_GOOGLE_TOKENS': (state, tokens) => state.google.tokens = tokens,
         '[MAIN] SET_INIT_DATA': (state, initData) => {
             state.youtubeToken = initData.youtubeToken;
             state.hahowToken = initData.hahowToken;
@@ -28,7 +33,7 @@ export default new Vuex.Store({
     },
     actions: {
         '[MAIN] SET_HAHOW_TOKEN': ({commit}, token) => commit('[MAIN] SET_HAHOW_TOKEN', token),
-        '[MAIN] SET_YOUTUBE_TOKEN': ({commit}, token) => commit('[MAIN] SET_YOUTUBE_TOKEN', token),
+        '[MAIN] SET_GOOGLE_TOKENS': ({commit}, tokens) => commit('[MAIN] SET_GOOGLE_TOKENS', tokens),
         '[MAIN] SET_INIT_DATA': ({commit}, initData) => commit('[MAIN] SET_INIT_DATA', initData),
         '[MAIN] OPEN_LOADING_MASK': ({commit}) => commit('[MAIN] OPEN_LOADING_MASK'),
         '[MAIN] CLOSE_LOADING_MASK': ({commit}) => commit('[MAIN] CLOSE_LOADING_MASK'),

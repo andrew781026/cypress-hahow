@@ -17,8 +17,8 @@ window.addEventListener('DOMContentLoaded', () => {
     window.registerFuncs = registerFuncs;
 
     // the relate methods of **Electron Windows Badge**
-    registerFuncs.updateBadge = (badge) => ipcRenderer.send('update-badge', badge);
-    registerFuncs.removeBadge = () => ipcRenderer.send('update-badge', null);
+    // registerFuncs.updateBadge = (badge) => ipcRenderer.send('update-badge', badge);
+    // registerFuncs.removeBadge = () => ipcRenderer.send('update-badge', null);
 
     registerFuncs.appendText = (text) => {
 

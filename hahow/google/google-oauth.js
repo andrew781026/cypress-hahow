@@ -4,15 +4,15 @@ const http = require('http');
 const url = require('url');
 const opn = require('open');
 const axios = require('axios');
-const readline = require('readline');
 
+const YOUTUBE_TOKEN = require('../response/youtube-token.json');
 const {google} = require('googleapis');
 const youtube = google.youtube('v3'); // google.options 有設定 oauth2Client 之後會用那裏的驗證
 
 /**
  * To use OAuth2 authentication, we need access to a a CLIENT_ID, CLIENT_SECRET, AND REDIRECT_URI.  To get these credentials for your application, visit https://console.cloud.google.com/apis/credentials.
  */
-const keyPath = path.join(__dirname, '../response/oauth2.keys.json');
+const keyPath = path.join(__dirname, '../response/client_secret-youtube-test.json');
 let keys = {redirect_uris: ['http://localhost:3000/oauth2callback']};
 if (fs.existsSync(keyPath)) {
     keys = {...keys, ...require(keyPath).web};
@@ -24,7 +24,7 @@ if (fs.existsSync(keyPath)) {
 const oauth2Client = new google.auth.OAuth2(
     keys.client_id,
     keys.client_secret,
-    keys.redirect_uris[0]
+    'http://localhost:3000/oauth2callback'
 );
 
 /**
@@ -41,29 +41,54 @@ async function authenticate(scopes) {
         const authorizeUrl = oauth2Client.generateAuthUrl({
             access_type: 'offline',
             scope: scopes.join(' '),
+            prompt: 'consent',
+            redirect_uri: 'http://localhost:3000/oauth2callback'
         });
         const server = http
             .createServer((req, res) => {
                 if (req.url.indexOf('/oauth2callback') > -1) {
                     const qs = new url.URL(req.url, 'http://localhost:3000').searchParams;
-                    res.end('Authentication successful! Please return to the console.');
-
-                    // Close the server
-                    server.close(() => console.log('Server closed!'));
 
                     oauth2Client.getToken(qs.get('code'))
                         .then(({tokens}) => {
+
+                            // show access_token and api_key to html
+                            res.end(`
+                                <h1>Authentication successful!</h1>
+                                <table style="border-collapse: collapse;">
+                                    <tr>
+                                        <td style="border: 1px solid black;padding: 10px;">API_KEY</td>
+                                        <td style="border: 1px solid black;padding: 10px;">${YOUTUBE_TOKEN.API_KEY}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid black;padding: 10px;">EXPIRY_DATE</td>
+                                        <td style="border: 1px solid black;padding: 10px;">${new Date(tokens.expiry_date).toDateString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid black;padding: 10px;">ACCESS_TOKEN</td>
+                                        <td style="border: 1px solid black;padding: 10px;">${tokens.access_token}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid black;padding: 10px;">REFRESH_TOKEN</td>
+                                        <td style="border: 1px solid black;padding: 10px;">${tokens.refresh_token}</td>
+                                    </tr>
+                                </table>
+                            `);
+
                             console.log('token=', tokens);
-                            const YOUTUBE_TOKEN = require('../response/youtube-token.json');
                             oauth2Client.credentials = tokens;
                             resolve({access_token: tokens.access_token, api_key: YOUTUBE_TOKEN.API_KEY});
-                        })
-                        .catch(e => {
-                            res.end('Authentication failed.');
-                            reject(e);
 
                             // Close the server
                             server.close(() => console.log('Server closed!'));
+                        })
+                        .catch(e => {
+                            res.end('Authentication failed.');
+
+                            // Close the server
+                            server.close(() => console.log('Server closed!'));
+
+                            reject(e);
                         });
                 } else {
                     res.end('Wrong Url.You need to set http://localhost:3000/oauth2callback as redirect_uri');
@@ -75,6 +100,22 @@ async function authenticate(scopes) {
                 console.log('access api at http://localhost:3000');
             });
     });
+}
+
+// use refresh_token get a new access_token
+async function getAccessTokenByRefresh(){
+
+    /*
+    POST https://www.googleapis.com/oauth2/v4/token
+        Content-Type: application/json
+
+    {
+        "client_id": <client_id>,
+        "client_secret": <client_secret>,
+        "refresh_token": <refresh_token>,
+        "grant_type": "refresh_token"
+    }
+     */
 }
 
 // 新增撥放清單
@@ -139,9 +180,7 @@ async function addVideo({access_token, api_key, channelId = 'UC8eCqbosTLZdvFCGid
             // number of bytes uploaded to this point.
             onUploadProgress: evt => {
                 const progress = (evt.bytesRead / fileSize) * 100;
-                readline.clearLine(process.stdout, 0);
-                readline.cursorTo(process.stdout, 0, null);
-                process.stdout.write(`${Math.round(progress)}% complete\n`);
+                console.log(`${Math.round(progress)}% complete`);
             },
         }
     );
@@ -225,11 +264,12 @@ async function getPlayListById({access_token, api_key, playlistId = 'PLW5vcWZJoR
 }
 
 const scopes = [
-    'https://www.googleapis.com/auth/youtube' // scope for add playlist
+    'https://www.googleapis.com/auth/youtube' // scope for add playlist . upload video ...
 ];
 
 authenticate(scopes)
-    .then(addPlayList)
+    // .then(({access_token, api_key}) => console.table({access_token, api_key}))
+    // .then(addPlayList)
     // .then(addVideo)
     // .then(addVideoToPlayList)
     // .then(getMyPlayList)

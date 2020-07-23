@@ -17,12 +17,22 @@ class DbUtils {
         return globalDB;
     }
 
-    static setYoutubeToken(apiKey) {
-        globalDB.set('youtubeToken', apiKey).write();
+    static setGoogleOAuth2Info(oAuth2Info) {
+        globalDB.set('google', oAuth2Info).write();
     }
 
-    static getYoutubeToken() {
-        return globalDB.get('youtubeToken').value();
+    static updateGoogleOAuth2Info(oAuth2Info) {
+        globalDB.assign('google', oAuth2Info).write();
+    }
+
+    static getGoogleOAuth2Info() {
+        return globalDB.get('google').value();
+    }
+
+    static getSavedTokens() {
+
+        const googleOAuth2Info = globalDB.get('google').value();
+        return googleOAuth2Info && googleOAuth2Info.tokens;
     }
 
     static setHahowToken(token) {

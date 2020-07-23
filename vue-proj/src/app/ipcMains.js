@@ -1,17 +1,19 @@
 import {ipcMain, shell} from "electron";
 import HahowUtils from '../utils/hahowUtils';
 import DbUtils from '../utils/dbUtils';
+import GoogleOAuth2Util from '../utils/google/GoogleOAuth2Util';
 import HttpUtil from '../utils/httpUtil';
 import path from 'path';
 import fs from "fs";
 import {createFolderIfNotExist, escapeFileName, getThrottleFunc} from '../utils/ezoomUtils';
+import {google} from "googleapis";
 
 // 連接到 lowdb 資料檔
 ipcMain.handle('connect-to-json-db', async (event, args) => {
 
     const db = DbUtils.getDataBase({
         filePath: path.resolve(__dirname, '../data/db.json'),
-        defaultJson: {youtubeToken: '', hahowToken: '', courses: []}
+        defaultJson: {google: {tokens: null, clientId: '', clientSecret: ''}, hahowToken: '', courses: []}
     });
 
     DbUtils.setGlobalDB(db);
@@ -23,11 +25,20 @@ ipcMain.handle('get-json-db-all-info', (event, args) => {
     return DbUtils.getGlobalDB().getState(); // { youtubeToken: '', hahowToken: '', courses: [] }
 });
 
-// .handle method can return result to ipcRenderer.invoke
-ipcMain.handle('save-youtubeToken', async (apiKey) => {
+ipcMain.handle('google-login', async (event, {clientId, clientSecret}) => {
 
-    DbUtils.setYoutubeToken(apiKey);
-    return 'you save youtube success';
+    DbUtils.updateGoogleOAuth2Info({clientId, clientSecret});
+    const savedTokens = DbUtils.getSavedTokens();
+
+    const oauth2Util = new GoogleOAuth2Util({
+        clientId,
+        clientSecret,
+        scopes: ['https://www.googleapis.com/auth/youtube'], // scope for add playlist . upload video ...
+        saveToken: tokens => DbUtils.updateGoogleOAuth2Info({tokens})
+    });
+
+    const tokens = await oauth2Util.openAuthPageAndGetAuthorizationCode(savedTokens);
+    return tokens;
 });
 
 // .handle method can return result to ipcRenderer.invoke
@@ -207,4 +218,9 @@ ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, vid
             downloadStreams[url] = duplexStream;
         })
         .catch(err => console.error(err));
+});
+
+ipcMain.on('save-google-auth-info', (event, {clientId, clientSecret}) => {
+
+    DbUtils.updateGoogleOAuth2Info({clientId, clientSecret});
 });
