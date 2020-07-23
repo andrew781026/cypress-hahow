@@ -145,8 +145,8 @@ class GoogleOAuth2Util {
 }
 
 const oauth2Util = new GoogleOAuth2Util({
-    clientId: "523222890174-t6a777js4s614faepfvjfpj6vbufnve7.apps.googleusercontent.com",
-    clientSecret: "2sGqzoJgr6kQHil6VlQtV0x7",
+    clientId: "YOUR_CLIENT_ID",
+    clientSecret: "YOUR_CLIENT_SECRET",
     scopes: ['https://www.googleapis.com/auth/youtube'], // scope for add playlist . upload video ...
     saveToken: tokens => console.log('saveToken , tokens=', tokens)
 });

@@ -81,8 +81,8 @@
         data() {
 
             return {
-                clientId: '523222890174-t6a777js4s614faepfvjfpj6vbufnve7.apps.googleusercontent.com',
-                clientSecret: '2sGqzoJgr6kQHil6VlQtV0x7',
+                clientId: '',
+                clientSecret: '',
             }
         },
     }
