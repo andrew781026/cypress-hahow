@@ -1,3 +1,4 @@
+import fs from 'fs';
 import axios from 'axios';
 
 class YoutubeUtils {
@@ -32,11 +33,15 @@ class YoutubeUtils {
     }
 
     // 上傳影片 (youtube.video.insert)
-    async addVideo({googleApis, channelId = 'UC8eCqbosTLZdvFCGid5YllA', fileName = '../data/video.mp4'}) {
+    async addVideo({
+                       googleApis,
+                       channelId = 'UC8eCqbosTLZdvFCGid5YllA',
+                       fileName,
+                       title = `your-video-${new Date().getTime().toString(36).substring(0, 4)}`,
+                       description = '測試上傳影片'
+                   }) {
 
         const youtube = googleApis.youtube('v3'); // google.options 有設定 oauth2Client 之後會用那裏的驗證
-
-        const nowStr = new Date().getTime().toString(36).substring(0, 4);
 
         const fileSize = fs.statSync(fileName).size;
         const res = await youtube.videos.insert(
@@ -46,8 +51,8 @@ class YoutubeUtils {
                 requestBody: {
                     snippet: {
                         channelId, // 上傳影片到哪個頻道
-                        title: `your-video-${nowStr}`,
-                        description: '測試上傳影片',
+                        title,
+                        description,
                     },
                     status: {
                         privacyStatus: "private"
@@ -136,6 +141,5 @@ class YoutubeUtils {
     }
 
 }
-
 
 export default YoutubeUtils;

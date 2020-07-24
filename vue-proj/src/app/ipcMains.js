@@ -2,6 +2,7 @@ import {ipcMain, shell} from "electron";
 import HahowUtils from '../utils/hahowUtils';
 import DbUtils from '../utils/dbUtils';
 import GoogleOAuth2Util from '../utils/google/GoogleOAuth2Util';
+import YoutubeUtils from '../utils/google/YoutubeUtils';
 import HttpUtil from '../utils/httpUtil';
 import path from 'path';
 import fs from "fs";
@@ -226,6 +227,20 @@ ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, vid
             downloadStreams[url] = duplexStream;
         })
         .catch(err => console.error(err));
+});
+
+// 上傳影片
+ipcMain.handle('upload-video', async (event, args) => {
+
+    const {videoTitle, courseTitle, description} = args;
+    const destFolder = path.resolve(__dirname, `../data/videos/${escapeFileName(courseTitle)}`);
+    const targetPath = `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`;
+
+    const savedTokens = DbUtils.getSavedTokens();
+
+    const googleApis = GoogleOAuth2Util.getGoogleApis(savedTokens);
+    await new YoutubeUtils().addVideo({googleApis, fileName: targetPath, title: videoTitle, description});
+    return 'OK!';
 });
 
 ipcMain.on('save-google-auth-info', (event, {clientId, clientSecret}) => {

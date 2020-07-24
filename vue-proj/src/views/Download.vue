@@ -71,6 +71,8 @@
             numberFormatter,
             ...mapActions({
                 showLightBox: '[MAIN] SHOW_LIGHT_BOX',
+                openLoadingMask: '[MAIN] OPEN_LOADING_MASK',
+                closeLoadingMask: '[MAIN] CLOSE_LOADING_MASK',
             }),
             downloadVideo(videoInfo) {
                 console.log('start to download video');
@@ -128,9 +130,17 @@
                 alert('pause 功能尚未實作');
                 console.log('videoInfo=', videoInfo);
             },
-            uploadVideo(videoInfo) {
-                alert('上傳影片功能尚未實作');
-                console.log('videoInfo=', videoInfo);
+            uploadVideo(videoInfo = {}) {
+
+                this.openLoadingMask();
+                window.ipcRenderer.invoke('upload-video', {
+                    ...videoInfo,
+                    description: `${this.course.title}-單元-${videoInfo.title}`,
+                    courseTitle: this.course.title,
+                    videoTitle: videoInfo.title,
+                })
+                    .then(() => this.closeLoadingMask())
+                    .catch(err => console.error(err)); // TODO 顯示取得資料失敗
             }
         },
         data() {

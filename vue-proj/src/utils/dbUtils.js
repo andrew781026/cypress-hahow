@@ -15,8 +15,7 @@ const DbUtils = {
 
     updateGoogleOAuth2Info: oauth2Info => {
 
-        const googleData = globalDB.get('google').value();
-        globalDB.set('google', {...googleData, ...oauth2Info}).write();
+        globalDB.get('google').assign(oauth2Info).write();
     },
 
     getGoogleOAuth2Info: () => globalDB.get('google').value(),
