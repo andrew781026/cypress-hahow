@@ -17,6 +17,7 @@ export default new Vuex.Store({
     getters: {
         '[GLOBAL] getLoadingBlockOpen': (state) => state.showMask,
         '[GLOBAL] getLightBoxInfo': (state) => state.lightBox,
+        '[GLOBAL] getHahowToken': (state) => state.hahowToken,
         '[GLOBAL] getAccessToken': (state) => state.google.tokens && state.google.tokens.access_token,
     },
     mutations: {
