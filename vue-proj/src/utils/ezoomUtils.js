@@ -39,7 +39,7 @@ export const createFolderIfNotExist = targetPath => {
 export const escapeFileName = fileName => sanitize(fileName, {replacement: '_'}).replace(' ','_');
 
 export function debounce(func, delay) {
-    var timer = null;
+    let timer = null;
     return function () {
         var context = this;
         var args = arguments;
@@ -49,7 +49,7 @@ export function debounce(func, delay) {
 }
 
 export function throttle(func, threshhold = 250) {
-    var last, timer;
+    let last, timer;
     return function () {
         var context = this
         var args = arguments

@@ -10,7 +10,7 @@
                        @keypress.enter="save" placeholder="Enter Your Hahow API KEY"/>
             </div>
         </template>
-        <div v-else>
+        <div class="mb-8" v-else>
             <h3>已儲存的 Hahow API KEY 是</h3>
             <div class="text-yellow break-words bg-black rounded-6 p-8 mt-2">
                 {{hahowToken}}

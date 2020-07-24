@@ -43,7 +43,22 @@
         computed: {
             ...mapGetters({
                 accessToken: '[GLOBAL] getAccessToken',
+                googleAuthInfo: '[GLOBAL] getGoogleAuthInfo',
             }),
+        },
+        created() {
+
+            if (this.googleAuthInfo) {
+
+                this.clientId = this.googleAuthInfo.clientId;
+                this.clientSecret = this.googleAuthInfo.clientSecret;
+            }
+        },
+        updated() {
+
+            console.log('this.clientId=', this.clientId);
+            console.log('this.clientSecret=', this.clientSecret);
+            console.log('this.googleAuthInfo=', this.googleAuthInfo);
         },
         methods: {
             ...mapActions({
@@ -61,7 +76,6 @@
                     clientId: this.clientId,
                     clientSecret: this.clientSecret
                 });
-                this.clear();
             },
             clear() {
                 this.clientId = '';

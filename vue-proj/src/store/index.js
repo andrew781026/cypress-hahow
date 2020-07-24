@@ -18,14 +18,19 @@ export default new Vuex.Store({
         '[GLOBAL] getLoadingBlockOpen': (state) => state.showMask,
         '[GLOBAL] getLightBoxInfo': (state) => state.lightBox,
         '[GLOBAL] getHahowToken': (state) => state.hahowToken,
+        '[GLOBAL] getGoogleAuthInfo': (state) => state.google,
         '[GLOBAL] getAccessToken': (state) => state.google.tokens && state.google.tokens.access_token,
     },
     mutations: {
         '[MAIN] SET_HAHOW_TOKEN': (state, token) => state.hahowToken = token,
         '[MAIN] SET_GOOGLE_TOKENS': (state, tokens) => state.google.tokens = tokens,
         '[MAIN] SET_INIT_DATA': (state, initData) => {
-            state.youtubeToken = initData.youtubeToken;
             state.hahowToken = initData.hahowToken;
+            state.google = {
+                clientId: initData.google.clientId || state.google.clientId,
+                clientSecret: initData.google.clientSecret || state.google.clientSecret,
+                tokens: initData.google.tokens || state.google.tokens,
+            };
         },
         '[MAIN] OPEN_LOADING_MASK': (state) => state.showMask = true,
         '[MAIN] CLOSE_LOADING_MASK': (state) => state.showMask = false,

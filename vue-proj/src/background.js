@@ -54,6 +54,10 @@ function createWindow() {
     // 設定進度條
     win.setProgressBar(0.5);
 
+    // 設定閃爍特效
+    win.flashFrame(true);
+    win.on('focus', () => win.flashFrame(false));
+
     // 設定數字小圖示
     const badgeOptions = {};
     new Badge(win, badgeOptions);
