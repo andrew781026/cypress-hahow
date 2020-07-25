@@ -1,4 +1,4 @@
-import {ipcMain, shell} from "electron";
+import {BrowserWindow, ipcMain, shell} from "electron";
 import HahowUtils from '../utils/hahowUtils';
 import DbUtils from '../utils/dbUtils';
 import GoogleOAuth2Util from '../utils/google/GoogleOAuth2Util';
@@ -157,20 +157,47 @@ ipcMain.on('open-mp4', (event, {courseTitle, videoTitle}) => {
 });
 
 // 用瀏覽器開啟指定的 URL
-ipcMain.on('open-url', (event, url) => shell.openExternal(url));
+ipcMain.on('open-external-url', (event, url) => shell.openExternal(url));
+
+// 用瀏覽器開啟指定的 URL
+ipcMain.on('open-url', (event, url) => {
+
+    const win = new BrowserWindow({
+        width: 600,
+        height: 400,
+        autoHideMenuBar: true,
+        icon: path.join(__dirname, '../public/elearning.ico'),
+    });
+
+    win.loadURL(url);
+
+    const currentUrl = win.webContents.getURL();
+    console.log(currentUrl);
+});
 
 const downloadStreams = {};
 
 ipcMain.handle('pause-download-video', (event, url) => {
 
-    const duplexStream = downloadStreams[url];
-    return duplexStream.pause(); // 暫停下載
+    return new Promise((resolve, reject) => {
+
+        try {
+
+            const duplexStream = downloadStreams[url];
+            duplexStream.pause(); // 暫停下載
+            setTimeout(resolve, 500);
+
+        } catch (err) {
+            reject(err);
+        }
+    });
 });
 
 ipcMain.handle('resume-download-video', (event, url) => {
 
     const duplexStream = downloadStreams[url];
-    return duplexStream.resume(); // 繼續下載
+    duplexStream.resume(); // 繼續下載
+    return 'resume';
 });
 
 ipcMain.handle('cancel-download-video', (event, url) => {
@@ -210,21 +237,16 @@ ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, vid
         return lectureInfo;
     };
 
-    const getNewUrlToDownloadVideo = async (lectureId, courseId) => {
-
-        const {videoUrl} = await getLectureInfo(lectureId, courseId);
-        return downloadVideo(videoUrl);
-    }
-
     // 確認 videoUrl 是否有效 , 當 videoUrl 無效時 ( HEAD method 呼叫 url 會回傳 statusCode = 410 Gone ) , 需要取得一個新的
     HttpUtil.checkVideoExist(url)
         .then(videoExist => {
-            if (videoExist) downloadVideo(url);
-            else getNewUrlToDownloadVideo(lectureId, courseId);
-        })
-        .then(duplexStream => {
-            console.log('duplexStream=', duplexStream);
-            downloadStreams[url] = duplexStream;
+
+            if (videoExist) downloadStreams[url] = downloadVideo(url);
+            else {
+
+                getLectureInfo(lectureId, courseId)
+                    .then(({videoUrl}) => downloadStreams[videoUrl] = downloadVideo(videoUrl))
+            }
         })
         .catch(err => console.error(err));
 });

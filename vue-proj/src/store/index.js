@@ -24,12 +24,14 @@ export default new Vuex.Store({
     mutations: {
         '[MAIN] SET_HAHOW_TOKEN': (state, token) => state.hahowToken = token,
         '[MAIN] SET_GOOGLE_TOKENS': (state, tokens) => state.google.tokens = tokens,
-        '[MAIN] SET_INIT_DATA': (state, initData) => {
+        '[MAIN] SET_INIT_DATA': (state, initData = {}) => {
             state.hahowToken = initData.hahowToken;
+
+            const initDataGoogle = initData.google || {};
             state.google = {
-                clientId: initData.google.clientId || state.google.clientId,
-                clientSecret: initData.google.clientSecret || state.google.clientSecret,
-                tokens: initData.google.tokens || state.google.tokens,
+                clientId: initDataGoogle.clientId || state.google.clientId,
+                clientSecret: initDataGoogle.clientSecret || state.google.clientSecret,
+                tokens: initDataGoogle.tokens || state.google.tokens,
             };
         },
         '[MAIN] OPEN_LOADING_MASK': (state) => state.showMask = true,

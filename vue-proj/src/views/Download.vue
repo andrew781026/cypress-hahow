@@ -20,13 +20,19 @@
             <div class="flex flex-col ml-6 items-center">
                 <template v-if="item.percent !== 100">
                     <button type="button" class="btn btn-danger mb-6"
-                            @click="pauseDownload(item)"
-                            v-if="item.isDownloading">
+                            @click="pauseDownload(item,index)"
+                            v-if="item.downloadState === 'downloading'">
                         <img class="img-btn" src="../assets/pause.png" alt="暫停">
                         <span>暫停</span>
                     </button>
                     <button type="button" class="btn btn-danger mb-6"
-                            @click="downloadVideo(item)" v-else>
+                            @click="resumeDownload(item,index)"
+                            v-else-if="item.downloadState === 'pause'">
+                        <img class="img-btn" src="../assets/step.png" alt="繼續">
+                        <span>繼續</span>
+                    </button>
+                    <button type="button" class="btn btn-danger mb-6"
+                            @click="downloadVideo(item,index)" v-else>
                         <img class="img-btn" src="../assets/download.png" alt="下載">
                         <span>下載</span>
                     </button>
@@ -74,10 +80,9 @@
                 openLoadingMask: '[MAIN] OPEN_LOADING_MASK',
                 closeLoadingMask: '[MAIN] CLOSE_LOADING_MASK',
             }),
-            downloadVideo(videoInfo) {
-                console.log('start to download video');
+            downloadVideo(videoInfo, index) {
 
-                const lectureId = videoInfo.lectureId;
+                // const lectureId = videoInfo.lectureId;
                 window.ipcRenderer.send('download-video', {
                     url: videoInfo.videoUrl,
                     courseTitle: this.course.title,
@@ -89,9 +94,7 @@
                 // 將 "下載按鈕" 轉變成 "暫停按鈕"
                 if (this.videosInfo) {
 
-                    const index = this.videosInfo.findIndex(video => video.lectureId === lectureId);
-                    const singleVideo = this.videosInfo[index];
-                    const newSingleVideo = {...singleVideo, isDownloading: true};
+                    const newSingleVideo = {...videoInfo, downloadState: 'downloading'};
                     this.videosInfo.splice(index, 1, newSingleVideo);
                 }
             },
@@ -126,9 +129,31 @@
                     videoTitle: videoInfo.title
                 });
             },
-            pauseDownload(videoInfo) {
-                alert('pause 功能尚未實作');
-                console.log('videoInfo=', videoInfo);
+            pauseDownload(videoInfo, index) {
+
+                const url = videoInfo.videoUrl;
+
+                window.ipcRenderer.invoke('pause-download-video', url)
+                    .then(() => {
+
+                        console.log('pause it');
+                        const newSingleVideo = {...videoInfo, downloadState: 'pause'};
+                        this.videosInfo.splice(index, 1, newSingleVideo);
+                    })
+                    .catch(err => console.error(err)); // TODO 顯示取得資料失敗
+            },
+            resumeDownload(videoInfo, index) {
+
+                const url = videoInfo.videoUrl;
+
+                window.ipcRenderer.invoke('resume-download-video', url)
+                    .then(() => {
+
+                        console.log('resume it');
+                        const newSingleVideo = {...videoInfo, downloadState: 'downloading'};
+                        this.videosInfo.splice(index, 1, newSingleVideo);
+                    })
+                    .catch(err => console.error(err)); // TODO 顯示取得資料失敗
             },
             uploadVideo(videoInfo = {}) {
 
