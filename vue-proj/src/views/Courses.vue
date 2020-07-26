@@ -1,6 +1,11 @@
 <template>
     <div>
-        <button type="button" class="btn btn-primary ml-12 mt-12" @click="getBoughtCourses">取得我的課程</button>
+        <button type="button" class="btn btn-primary ml-12 mt-12" @click="getBoughtCourses">
+            取得我的課程
+        </button>
+        <button type="button" class="btn btn-danger ml-12 mt-12" @click="addErrMsg">
+            新增錯誤訊息
+        </button>
         <div id="show-courses" class="pl-20 pb-32 flex flex-wrap w-full">
             <template v-for="(item,index) in courses">
                 <div class="relative mr-20 mt-40 course-container" :key="index" @click="getCourseVideos(item)">
@@ -42,9 +47,13 @@
 
 <script>
     import {mapActions} from 'vuex'
+    import Toastify from 'toastify-js'
 
     export default {
         name: "Courses",
+        mounted() {
+
+        },
         methods: {
             ...mapActions({
                 openLoadingMask: '[MAIN] OPEN_LOADING_MASK',
@@ -74,10 +83,25 @@
 
                 // const course_id = '56189df9df7b3d0b005c6639';
             },
+            addErrMsg() {
+
+                // https://www.youtube.com/watch?v=kkuZTAMyAFI
+                // https://apvarun.github.io/toastify-js/#
+
+                Toastify({
+
+                    text: "This is a toast",
+                    position: 'center',
+                    backgroundColor: "red",
+                    duration: 3000
+
+                }).showToast();
+            }
         },
         data() {
 
             return {
+                height: 1,
                 courses: [
                     {
                         "creationsProgress": 0,

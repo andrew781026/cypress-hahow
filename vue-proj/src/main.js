@@ -3,6 +3,7 @@ import App from './App.vue';
 import store from './store';
 import router from './router';
 
+import "toastify-js/src/toastify.css"
 import 'bootstrap/dist/css/bootstrap.css';
 import './css/tailwind.css';
 import './css/main.css';
