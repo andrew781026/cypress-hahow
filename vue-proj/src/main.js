@@ -6,6 +6,7 @@ import router from './router';
 import "toastify-js/src/toastify.css"
 import 'bootstrap/dist/css/bootstrap.css';
 import './css/tailwind.css';
+import './css/animate.css';
 import './css/main.css';
 
 Vue.config.productionTip = false;

@@ -13,11 +13,11 @@
 
 截圖 
 
-![](https://i.imgur.com/NSBoLfg.png)
+![設定 hahow api_key](https://i.imgur.com/NSBoLfg.png)
 
-![](https://i.imgur.com/nWLQsoD.png)
+![個人課程列表](https://i.imgur.com/nWLQsoD.png)
 
-![](https://i.imgur.com/cfbvsuq.png)
+![課程內容](https://i.imgur.com/cfbvsuq.png)
 
 
 ## 里程碑
@@ -34,6 +34,8 @@
 https://blog.typeart.cc/using-puppeteer-crawler-common-skills/
 
 如果要處理印表機功能 - https://www.npmjs.com/package/node-thermal-printer
+
+[Electron: 截獲 <webview> will-navigate 事件, 為內容來源實作白名單](https://medium.com/cow-say/electron-%E6%88%AA%E7%8D%B2-webview-will-navigate-%E4%BA%8B%E4%BB%B6-%E7%82%BA%E5%85%A7%E5%AE%B9%E4%BE%86%E6%BA%90%E5%AF%A6%E4%BD%9C%E7%99%BD%E5%90%8D%E5%96%AE-b31abb35d2c7)
 
 ## 好用的套件 
 
