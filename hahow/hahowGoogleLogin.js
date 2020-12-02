@@ -18,3 +18,8 @@ response :
        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzU5MmZjNjc5ZjE5OTAwMjJkZmYxMjAiLCJpc3MiOiJNakF5TURBMyIsImlhdCI6MTU5NTQ4NTI0OCwiZXhwIjoxNjAwNjY5MjQ4fQ.dc4K-BWJebMavskwVvVH2gfWW7WlZHRJ5EQ2YLNokP0"
     }
  */
+
+
+
+// https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?access_type=offline&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube&prompt=consent&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth2callback&response_type=code&client_id=523222890174-t6a777js4s614faepfvjfpj6vbufnve7.apps.googleusercontent.com&flowName=GeneralOAuthFlow
+

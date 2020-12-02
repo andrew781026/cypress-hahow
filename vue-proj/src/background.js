@@ -6,6 +6,7 @@ import {
     createProtocol,
     /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import './app/ipcMains';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -17,7 +18,7 @@ let win;
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: {secure: true, standard: true}}])
 
-function createWindow() {
+async function createWindow() {
 
     // Create the browser window.
     win = new BrowserWindow({
@@ -39,7 +40,8 @@ function createWindow() {
 
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         // Load the url of the dev server if in development mode
-        win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
+        // 需要 await , vue_devtool 才能安裝成功
+       await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
         if (!process.env.IS_TEST) win.webContents.openDevTools()
     } else {
         createProtocol('app');
@@ -80,33 +82,19 @@ app.on('window-all-closed', () => {
     }
 });
 
-app.on('activate', () => {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-        createWindow()
-    }
-});
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
     if (isDevelopment && !process.env.IS_TEST) {
         // Install Vue Devtools
-        // Devtools extensions are broken in Electron 6.0.0 and greater
-        // See https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/378 for more info
-        // Electron will not launch with Devtools extensions installed on Windows 10 with dark mode
-        // If you are not using Windows 10 dark mode, you may uncomment these lines
-        // In addition, if the linked issue is closed, you can upgrade electron and uncomment these lines
-        // try {
-        //   await installVueDevtools()
-        // } catch (e) {
-        //   console.error('Vue Devtools failed to install:', e.toString())
-        // }
-
+        try {
+            await installExtension(VUEJS_DEVTOOLS)
+        } catch (e) {
+            console.error('Vue Devtools failed to install:', e.toString())
+        }
     }
-    createWindow()
+   await createWindow()
 });
 
 // Exit cleanly on request from parent process in development mode.

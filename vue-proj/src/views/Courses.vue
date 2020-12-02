@@ -64,10 +64,32 @@
                 this.openLoadingMask();
                 window.ipcRenderer.invoke('get-personal-courses')
                     .then(courses => {
-                        this.courses = courses;
-                        this.closeLoadingMask();
+
+                        if (courses.isError) {
+
+                            const error = courses;
+
+                            const getText = err => {
+
+
+                                if (err.response.status === 401) {
+
+                                    return '沒有權限取的個人課程 , 請重新輸入 hahow-api-key'
+
+                                } else return err.response.statusText;
+                            };
+
+                            Toastify({
+                                text: getText(error),
+                                position: 'center',
+                                backgroundColor: "red",
+                                duration: 3000
+
+                            }).showToast();
+
+                        } else this.courses = courses;
                     })
-                    .catch(err => console.error(err)); // TODO 顯示取得資料失敗
+                    .finally(() => this.closeLoadingMask()); // TODO 顯示取得資料失敗
 
                 // const course_id = '56189df9df7b3d0b005c6639';
             },

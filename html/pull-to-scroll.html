@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pull To Scroll</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #004b;
+        }
+
+        body > div {
+            transform: translateY(-100px);
+            transition: 0.4s 10ms ease-in-out;
+        }
+
+        .card-wrapper {
+            perspective: 1000px;
+        }
+
+        .card {
+            width: calc(100% - 60px);
+            height: 200px;
+            background-color: #FDD835;
+            margin: 20px 30px 0 30px;
+            border-radius: 25px;
+            /* offset-x | offset-y | blur-radius | spread-radius | color */
+            box-shadow: 0 25px 25px rgba(0, 0, 0, 0.5);
+            transition: all 100ms ease-out;
+            transform: rotateX(0deg);
+        }
+
+        .loading-container {
+            height: 100px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-container > .loading {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: #fff;
+            border-right-color: #fff;
+            animation: loading 0.5s infinite forwards;
+        }
+
+        @keyframes loading {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+</head>
+<body>
+<div id="main">
+    <div class="loading-container">
+        <div class="loading"></div>
+    </div>
+    <div class="flex flex-col mb-12">
+        <div class="card-wrapper">
+            <div class="card"></div>
+        </div>
+        <div class="card-wrapper">
+            <div class="card"></div>
+        </div>
+        <div class="card-wrapper">
+            <div class="card"></div>
+        </div>
+        <div class="card-wrapper">
+            <div class="card"></div>
+        </div>
+        <div class="card-wrapper">
+            <div class="card"></div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('touchstart', e => swipeStart(e), false);
+    document.addEventListener('touchmove', e => swipe(e), false);
+    document.addEventListener('touchend', e => swipeEnd(e), false);
+
+    const pStart = {x: 0, y: 0};
+    const pCurrent = {x: 0, y: 0};
+    const cards = document.querySelectorAll('.card');
+    const main = document.querySelector('#main');
+    let isLoading = false;
+    let currentMainTransformY = 0;
+
+    function swipeStart(e) {
+
+        if (e.targetTouches) {
+
+            let touch = e.targetTouches[0];
+            pStart.x = touch.screenX;
+            pStart.y = touch.screenY;
+
+        } else {
+
+            pStart.x = e.screenX;
+            pStart.y = e.screenY;
+        }
+
+        const getCurrentMainTransformY = () => {
+
+            if (main.style.transform) {
+
+                const regex = /translateY\((.*)px\)/;
+                const currentMainTransformY = main.style.transform;
+                const match = currentMainTransformY.match(regex);
+                return parseInt(match[1]);
+
+            } else return 0;
+        }
+
+        currentMainTransformY = getCurrentMainTransformY();
+        main.style.transition = '10ms ease-in-out';
+    }
+
+    function swipe(e) {
+
+        if (document.body.scrollTop === 0) {
+
+            if (e.targetTouches) {
+
+                let touch = e.targetTouches[0];
+                pCurrent.x = touch.screenX;
+                pCurrent.y = touch.screenY;
+
+            } else {
+
+                pCurrent.x = e.screenX;
+                pCurrent.y = e.screenY;
+            }
+
+            let changeY = (pCurrent.y - pStart.y);
+            const totalMainTransformY = currentMainTransformY + changeY;
+
+
+            if (totalMainTransformY > 300) loading();
+            else main.style.transform = `translateY(${totalMainTransformY}px)`;
+
+            const rotation = changeY < 100 ? changeY * 30 / 100 : 30;
+            for (const card of cards) {
+                card.style.transform = `rotateX(${rotation}deg)`;
+            }
+        }
+    }
+
+    function swipeEnd(e) {
+
+        if (document.body.scrollTop === 0 && !isLoading) {
+            for (const card of cards) {
+                card.style.transform = `rotateX(0deg)`;
+            }
+        }
+    }
+
+    function loading() {
+        isLoading = true;
+        setTimeout(() => {
+
+            main.style.transition = '1s 10ms ease-in-out';
+            main.style.transform = `translateY(-100px)`;
+            isLoading = false;
+            currentMainTransformY = 0;
+
+            for (const card of cards) {
+                card.style.transform = `rotateX(0deg)`;
+            }
+
+        }, 2000);
+    }
+</script>
+</body>
+</html>

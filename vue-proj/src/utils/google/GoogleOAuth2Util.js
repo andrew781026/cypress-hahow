@@ -1,6 +1,7 @@
 import http from 'http';
 import url from 'url';
 import opn from 'open';
+import queryString from 'query-string';
 
 import {google} from 'googleapis';
 
@@ -8,6 +9,7 @@ class GoogleOAuth2Util {
 
     constructor({clientId, clientSecret, scopes = [], redirectPort = 3000, saveToken}) {
 
+        this.clientId = clientId;
         this.scopes = scopes;
         this.redirectPort = redirectPort;
         this.oauth2Client = new google.auth.OAuth2(
@@ -48,16 +50,32 @@ class GoogleOAuth2Util {
 
     generateAuthUrl() {
 
-        const redirectPort = this.redirectPort;
         const oauth2Client = this.oauth2Client;
+        const redirectPort = this.redirectPort;
         const scopes = this.scopes;
+        const client_id = this.clientId;
 
+        const parsed = {
+            access_type: 'offline',
+            scope: scopes.join(' '),
+            // prompt: 'consent', // add prompt: 'consent' to get refresh_token
+            redirect_uri: `http://localhost:${redirectPort}/oauth2callback`,
+            response_type: 'code',
+            client_id,
+            flowName: 'GeneralOAuthFlow',
+        };
+
+        const stringified = queryString.stringify(parsed);
+
+        return `https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?${stringified}`
+        /*
         return oauth2Client.generateAuthUrl({
             access_type: 'offline',
             scope: scopes.join(' '),
-            // prompt: 'consent', // add prompt: 'consent' to ger refresh_token
+            // prompt: 'consent', // add prompt: 'consent' to get refresh_token
             redirect_uri: `http://localhost:${redirectPort}/oauth2callback`
         });
+         */
     }
 
     static setOauth2Tokens(oauth2Client, tokens) {
@@ -90,7 +108,14 @@ class GoogleOAuth2Util {
         const renderRedirectHtml = GoogleOAuth2Util.renderRedirectHtml;
         const setOauth2Tokens = GoogleOAuth2Util.setOauth2Tokens;
 
-        if (savedTokens) {
+        // token 已過期 , 可用 refresh_token 取得新的
+        if (savedTokens && savedTokens.refresh_token) {
+
+            setOauth2Tokens(oauth2Client, savedTokens);
+            return {...savedTokens, googleApis: google};
+
+            // token 尚未過期
+        } else if (savedTokens && new Date(savedTokens.expiry_date) > new Date()) { // "expiry_date": 1597119480777
 
             setOauth2Tokens(oauth2Client, savedTokens);
             return {...savedTokens, googleApis: google};

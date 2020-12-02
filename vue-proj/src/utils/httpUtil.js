@@ -7,13 +7,16 @@ const getApiToken = jwtToken => `Bearer ${jwtToken}`;
 const HttpUtil = {
     async get({url, token}) {
 
-        const response = await Axios({
-            method: "GET",
-            url,
-            headers: {Authorization: getApiToken(token)},
-        });
+        return new Promise((resolve, reject) => {
 
-        return await response.data;
+            Axios({
+                method: "GET",
+                url,
+                headers: {Authorization: getApiToken(token)},
+            })
+                .then(response => resolve(response.data))
+                .catch(error => reject(error));
+        })
     },
     download,
     async checkVideoExist(url) {
