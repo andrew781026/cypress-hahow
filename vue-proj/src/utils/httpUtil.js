@@ -60,6 +60,20 @@ const HttpUtil = {
         // duplexStream.pause();  // 下載暫停
         // duplexStream.resume(); // 下載繼續
         return duplexStream;
+    },
+    srtDownload: (url, dest) => {
+
+        const writeStream = fs.createWriteStream(dest);
+
+        const duplexStream = download(url);
+
+        duplexStream.on("error", err => console.error(err));
+
+        duplexStream.pipe(writeStream);
+
+        // duplexStream.pause();  // 下載暫停
+        // duplexStream.resume(); // 下載繼續
+        return duplexStream;
     }
 };
 

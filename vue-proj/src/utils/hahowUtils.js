@@ -81,6 +81,12 @@ class HahowUtils {
           },
           ...
         ],
+        "subtitles": [
+          {
+            "link": "https://subtitles.api.hahow.in/subtitles/BkMx7gYfb",
+            "language": "zh-TW"
+          }
+        ],
         ...
       }
     }
@@ -92,6 +98,7 @@ class HahowUtils {
 
         return {
             lectureId,
+            srtUrl: data.video.subtitles[0].link,
             imageUrl: data.video.previewImageUrls.VIMEO && data.video.previewImageUrls.VIMEO.DIMENSION_W1000,
             videoUrl: data.video.videos.find(item => item.quality === 'hd' && item.width === 1920).link,
             totalLength: data.video.videos.find(item => item.quality === 'hd' && item.width === 1920).size,

@@ -76,6 +76,7 @@
     }
 
     .nav-title-text {
+        user-select: none;
         font-weight: 900;
         font-size: 20px;
         color: aliceblue;
@@ -91,6 +92,14 @@
 
     .click-bigger:active {
         transform: scale(1.1);
+
+      &:first-child{
+        transform-origin: top left;
+      }
+
+      &:last-child{
+        transform-origin: top right;
+      }
     }
 
     .bg-youtube {

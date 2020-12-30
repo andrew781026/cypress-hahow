@@ -224,7 +224,7 @@ ipcMain.handle('cancel-download-video', (event, url) => {
 });
 
 // 換頁到 Download 顯示課程詳細資訊
-ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, videoTitle}) => {
+ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, videoTitle, srtUrl}) => {
 
     const downloadVideo = (videoUrl) => {
 
@@ -237,6 +237,16 @@ ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, vid
         };
 
         return HttpUtil.videoDownload(videoUrl, `${destFolder}/${escapeFileName(videoTitle)}-video.mp4`, cb);
+    };
+
+    // 下載 srt 字幕檔
+    const downloadSrt = srtUrl => {
+
+        console.log('srtUrl=', srtUrl);
+        const destFolder = path.resolve(__dirname, `../data/srts/${escapeFileName(courseTitle)}`);
+        createFolderIfNotExist(destFolder);
+
+        return HttpUtil.srtDownload(srtUrl, `${destFolder}/${escapeFileName(videoTitle)}.srt`);
     };
 
     const getLectureInfo = async (lectureId, courseId) => {
@@ -258,11 +268,16 @@ ipcMain.on('download-video', (event, {url, courseId, courseTitle, lectureId, vid
     HttpUtil.checkVideoExist(url)
         .then(videoExist => {
 
-            if (videoExist) downloadStreams[url] = downloadVideo(url);
-            else {
+            if (videoExist) {
+
+                downloadStreams[url] = downloadVideo(url);
+                downloadSrt(srtUrl);
+            } else {
 
                 getLectureInfo(lectureId, courseId)
-                    .then(({videoUrl}) => downloadStreams[videoUrl] = downloadVideo(videoUrl))
+                    .then(({videoUrl}) => downloadStreams[videoUrl] = downloadVideo(videoUrl));
+
+                downloadSrt(srtUrl);
             }
         })
         .catch(err => console.error(err));

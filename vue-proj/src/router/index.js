@@ -13,16 +13,6 @@ Vue.use(VueRouter);
 
 const routes = [
     {
-        path: '/home',
-        name: 'Home',
-        component: () => import('../views/First.vue')
-    },
-    {
-        path: '/second',
-        name: 'Second',
-        component: () => import('../views/Second.vue')
-    },
-    {
         path: '/getSystemInfo',
         name: 'GetSystemInfo',
         component: () => import('../views/GetSystemInfo.vue')

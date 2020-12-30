@@ -91,7 +91,7 @@ const getLectureInfo = async ({lectureId, token}) => {
     const data = await HttpUtil.get({url: lectureInfoUrl, token});
 
     return {
-        imageUrl: data.video.previewImageUrls.VIMEO.DIMENSION_W1000,
+        imageUrl: data.video.previewImageUrls.VIMEO?.DIMENSION_W1000,
         videoUrl: data.video.videos.find(item => item.quality === 'sd' && item.width === 960).link,
         title: data.title
     };

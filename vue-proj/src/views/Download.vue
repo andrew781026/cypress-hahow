@@ -89,6 +89,7 @@
                     courseId: this.course._id,
                     lectureId: videoInfo.lectureId,
                     videoTitle: videoInfo.title,
+                    srtUrl: videoInfo.srtUrl,
                 });
 
                 // 將 "下載按鈕" 轉變成 "暫停按鈕"
