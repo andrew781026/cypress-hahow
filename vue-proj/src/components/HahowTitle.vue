@@ -1,157 +1,167 @@
 <template>
-    <div class="flex w-100 h-44 border-bottom border-top border-dark">
-        <template v-if="router.history.current.name === 'Download'">
-            <div class="flex justify-center items-center back-arrow" @click="router.back()">
-                <img class="mr-2 w-24" src="../assets/back-arrow.png" alt="back-arrow">
-            </div>
-            <div class="flex items-center">
-                <h3>{{getTitle()}}</h3>
-            </div>
-        </template>
-        <template v-else>
-            <div class="px-12 justify-center flex items-center border-right border-dark click-bigger"
-                 @click="link('GetSystemInfo')">
-                <span>退出</span>
-            </div>
-            <div class="nav-title-text bg-youtube click-bigger"
-                 @click="link('YoutubeSetting')">
-                <img class="mr-2 w-24" src="../assets/youtube-icon.png" alt="youtube-icon">
-                設定 Youtube
-            </div>
-            <div class="nav-title-text bg-hahow click-bigger"
-                 @click="link('HahowSetting')">
-                <img class="mr-2 w-24" src="../assets/hahow-icon.png" alt="hahow-icon">
-                設定 Hahow
-            </div>
-            <div class="nav-title-text bg-course click-bigger" @click="link('Course')">
-                <img class="mr-2 w-24" src="../assets/training.png" alt="course-icon">
-                我的課程
-            </div>
-        </template>
-    </div>
+  <div class="flex w-100 h-44 border-top border-bottom border-dark">
+    <template v-if="currentRouteName === 'Download'">
+      <div class="flex justify-center items-center back-arrow" @click="back">
+        <img class="mr-2 w-24" src="../assets/back-arrow.png" alt="back-arrow">
+      </div>
+      <div class="flex items-center">
+        <h3>{{ getTitle() }}</h3>
+      </div>
+    </template>
+    <template v-else>
+      <div class="nav-about-me click-bigger"
+           @click="link('About')">
+        <span>關於我</span>
+      </div>
+      <div class="nav-title-text flex-1 bg-youtube click-bigger"
+           @click="link('YoutubeSetting')">
+        <img class="mr-2 w-24" src="../assets/youtube-icon.png" alt="youtube-icon">
+        設定 Youtube
+      </div>
+      <div class="nav-title-text flex-1 bg-hahow click-bigger"
+           @click="link('HahowSetting')">
+        <img class="mr-2 w-24" src="../assets/hahow-icon.png" alt="hahow-icon">
+        設定 Hahow
+      </div>
+      <div class="nav-title-text flex-1 bg-course click-bigger" @click="link('Course')">
+        <img class="mr-2 w-24" src="../assets/training.png" alt="course-icon">
+        我的課程
+      </div>
+    </template>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: "HahowTitle",
-        methods: {
-            link(name) {
-                this.$router.push({name});
-            },
-            getTitle(){
-                return document.title;
-            }
-        },
-        watch: {
-            $router(value) {
-                this.router = value
-            }
-        },
-        data() {
-
-            return {
-                router: this.$router
-            }
-        }
+export default {
+  name: "HahowTitle",
+  methods: {
+    back() {
+      this.$router.back();
+    },
+    link(name) {
+      this.$router.push({name});
+    },
+    getTitle() {
+      return document.title;
     }
+  },
+  computed: {
+    currentRouteName() {
+      return this.$route.name;
+    }
+  },
+}
 </script>
 
 <style scoped lang="scss">
 
-    .back-arrow {
+.back-arrow {
 
-        margin: 5px;
-        border-radius: 50%;
-        width: 55px;
-        height: 55px;
-        transition: background-color 0.5s;
+  margin: 5px;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  transition: background-color 0.5s;
 
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-    }
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
 
-    .h-44 {
-        height: 4.4rem;
-    }
+.h-44 {
+  height: 4.4rem;
+}
 
-    .nav-title-text {
-        user-select: none;
-        font-weight: 900;
-        font-size: 20px;
-        color: aliceblue;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        flex-grow: 1;
-        flex-shrink: 0;
-        flex-basis: 0;
-        border-right: 1px solid #343a40;
-        padding-left: 16px;
-    }
+.nav-about-me {
+  user-select: none;
+  cursor: pointer;
+  background-color: aliceblue;
+  font-weight: 900;
+  font-size: 20px;
+  padding-left: 16px; // 1rem = 16px 1.2rem = 19.2px
+  padding-right: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 1px solid #343a40;
+}
 
-    .click-bigger:active {
-        transform: scale(1.1);
+.nav-title-text {
+  user-select: none;
+  font-weight: 900;
+  font-size: 20px;
+  color: aliceblue;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #343a40;
+  padding-left: 16px;
+}
 
-      &:first-child{
-        transform-origin: top left;
-      }
+.click-bigger:active {
+  transform: scale(1.1);
+  border-bottom: 1px solid #343a40;
+  border-left: 1px solid #343a40;
 
-      &:last-child{
-        transform-origin: top right;
-      }
-    }
+  &:first-child {
+    transform-origin: top left;
+  }
 
-    .bg-youtube {
+  &:last-child {
+    transform-origin: top right;
+  }
+}
 
-        background-color: #ff3232;
+.bg-youtube {
 
-        &:hover {
-            background-color: #e70404;
-        }
+  background-color: #ff3232;
 
-        &:active {
-            background-color: #cc0000;
-        }
-    }
+  &:hover {
+    background-color: #e70404;
+  }
 
-    .bg-hahow {
+  &:active {
+    background-color: #cc0000;
+  }
+}
 
-        background-color: #00D4A7;
+.bg-hahow {
 
-        &:hover {
-            background-color: #00c098;
-        }
+  background-color: #00D4A7;
 
-        &:active {
-            background-color: #00ad88;
-        }
-    }
+  &:hover {
+    background-color: #00c098;
+  }
 
-    .bg-course {
+  &:active {
+    background-color: #00ad88;
+  }
+}
 
-        background-color: #fbbd60;
+.bg-course {
 
-        &:hover {
-            background-color: #faad39;
-        }
+  background-color: #fbbd60;
 
-        &:active {
-            background-color: #e19b33;
-        }
-    }
+  &:hover {
+    background-color: #faad39;
+  }
 
-    .bg-download {
+  &:active {
+    background-color: #e19b33;
+  }
+}
 
-        background-color: #3b99ff;
+.bg-download {
 
-        &:hover {
-            background-color: #007bff;
-        }
+  background-color: #3b99ff;
 
-        &:active {
-            background-color: #0068d8;
-        }
-    }
+  &:hover {
+    background-color: #007bff;
+  }
+
+  &:active {
+    background-color: #0068d8;
+  }
+}
 
 </style>

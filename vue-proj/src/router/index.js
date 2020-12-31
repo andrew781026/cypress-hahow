@@ -13,6 +13,11 @@ Vue.use(VueRouter);
 
 const routes = [
     {
+        path: '/about',
+        name: 'About',
+        component: () => import('../views/About.vue')
+    },
+    {
         path: '/getSystemInfo',
         name: 'GetSystemInfo',
         component: () => import('../views/GetSystemInfo.vue')
