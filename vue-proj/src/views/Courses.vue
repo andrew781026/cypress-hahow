@@ -1,12 +1,6 @@
 <template>
     <div>
-        <button type="button" class="btn btn-primary ml-12 mt-12" @click="getBoughtCourses">
-            取得我的課程
-        </button>
-        <button type="button" class="btn btn-danger ml-12 mt-12" @click="addErrMsg">
-            新增錯誤訊息
-        </button>
-        <div id="show-courses" class="pl-20 pb-32 flex flex-wrap w-full">
+        <div v-if="courses && courses.length > 0" id="show-courses" class="pl-20 pb-32 flex flex-wrap w-full">
             <template v-for="(item,index) in courses">
                 <div class="relative mr-20 mt-40 course-container" :key="index" @click="getCourseVideos(item)">
                     <!-- 課程圖片 -->
@@ -42,6 +36,13 @@
                 </div>
             </template>
         </div>
+      <section v-else class="img-box flex flex-col justify-center items-center">
+        <h4 class="text-4xl font-700">找不到課程</h4>
+        <div>
+          <img id="img-left" src="../assets/course/webinar.png" alt="沒有課程">
+          <img id="img-right" src="../assets/course/close.png" alt="取消">
+        </div>
+      </section>
     </div>
 </template>
 
@@ -53,6 +54,7 @@
         name: "Courses",
         mounted() {
 
+          this.getBoughtCourses();
         },
         methods: {
             ...mapActions({
@@ -122,9 +124,8 @@
         },
         data() {
 
-            return {
-                height: 1,
-                courses: [
+          /*
+            範例資料 : courses = [
                     {
                         "creationsProgress": 0,
                         "lecturesVideoProgress": 0.034482758620689655, // 課程完成度
@@ -149,12 +150,31 @@
                         "totalVideoLengthInSeconds": 104721, // 課程時長
                     },
                 ]
+           */
+
+            return {
+                height: 1,
+                courses:[]
             }
         }
     }
 </script>
 
 <style scoped lang="scss">
+
+    .img-box {
+      min-height: calc(100vh - 150px);
+
+      #img-left{
+        transform: translateX(50%)
+      }
+
+      #img-right{
+        transform: translateX(-50%);
+        filter: drop-shadow(0 0 2px #333);
+      }
+    }
+
 
     .course-progress-bar {
         width: 80%;

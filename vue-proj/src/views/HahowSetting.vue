@@ -29,11 +29,6 @@
                 修改 API_KEY
             </button>
         </div>
-        <div>
-            <button type="button" class="btn btn-primary mr-8" @click="openAuthUrl">
-                開啟認證頁面
-            </button>
-        </div>
     </div>
 </template>
 
